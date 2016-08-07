@@ -1,0 +1,245 @@
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+label {
+  display: inline-block;
+  width: 100px;
+}
+
+input {
+  width: 500px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+button {
+  font-size: 16px;
+  padding: 5px;
+}
+
+h1, h2 {
+  display: block;
+  vertical-align: middle;
+  margin-top: 0px;
+  padding-bottom: 20px;
+}
+
+h2 {
+  color: #AAA;
+  font-size: 32px;
+}
+
+h3 {
+  font-weight: normal;
+  color: #AAA;
+  font-size: 24px;
+}
+
+.site {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.site-content {
+  flex: 1;
+}
+
+#status {}
+
+.black {
+  color: black;
+}
+
+.subheading {font-size: 24px; color: #ccc;}
+
+#accountBalance {padding-right: 20px;}
+#balance {
+  color: black;
+}
+#c_balance, #c_address {color: #ffffff;}
+#cb_balance {font-weight: bold;}
+.contract_address, .contract_balance {font-size: 22px;}
+.product {position: relative;}
+
+.ribbon {
+  position: absolute;
+  right: -5px; top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px; height: 75px;
+  text-align: right;
+}
+.ribbon span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 20px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  width: 100px;
+  display: block;
+  background: #79A70A;
+  background: linear-gradient(#B6BAC9 0%, #808080 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px; right: -21px;
+}
+.ribbon span::before {
+  content: "";
+  position: absolute; left: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid #808080;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #808080;
+}
+.ribbon span::after {
+  content: "";
+  position: absolute; right: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #808080;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #808080;
+}
+
+.tab-pane h1 {margin-top: 20px;}
+
+.footer-distributed{
+	background-color: #292c2f;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.12);
+	box-sizing: border-box;
+	width: 100%;
+	text-align: left;
+	font: normal 16px sans-serif;
+
+	padding: 30px 40px;
+	margin-top: 80px;
+}
+
+.footer-distributed .footer-left p{
+	color:  #8f9296;
+	font-size: 14px;
+	margin: 0;
+}
+
+.footer-distributed .footer-left button {margin-left: 8px;}
+
+/* Footer links */
+
+.footer-distributed p.footer-links{
+	font-size:18px;
+	font-weight: bold;
+	color:  #ffffff;
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+.footer-distributed p.footer-links a{
+	display:inline-block;
+	line-height: 1.8;
+	text-decoration: none;
+	color:  inherit;
+}
+
+.footer-distributed .footer-right{
+	float: right;
+	margin-top: 6px;
+	max-width: 250px;
+  color: #ffffff;
+}
+
+.footer-distributed .footer-right a{
+	display: inline-block;
+	width: 35px;
+	height: 35px;
+	background-color:  #33383b;
+	border-radius: 2px;
+
+	font-size: 20px;
+	color: #ffffff;
+	text-align: center;
+	line-height: 35px;
+
+	margin-left: 3px;
+}
+
+.hvr-grow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-grow:hover, .hvr-grow:focus, .hvr-grow:active {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+/* Pulse Grow */
+@-webkit-keyframes hvr-pulse-grow {
+  to {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes hvr-pulse-grow {
+  to {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+}
+
+.hvr-pulse-grow {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+}
+.hvr-pulse-grow:hover, .hvr-pulse-grow:focus, .hvr-pulse-grow:active {
+  -webkit-animation-name: hvr-pulse-grow;
+  animation-name: hvr-pulse-grow;
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+}
+
+/* If you don't want the footer to be responsive, remove these media queries */
+
+@media (max-width: 600px) {
+
+	.footer-distributed .footer-left,
+	.footer-distributed .footer-right{
+		text-align: center;
+	}
+
+	.footer-distributed .footer-right{
+		float: none;
+		margin: 0 auto 20px;
+	}
+
+	.footer-distributed .footer-left p.footer-links{
+		line-height: 1.8;
+	}
+}

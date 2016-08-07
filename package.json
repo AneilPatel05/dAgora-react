@@ -1,0 +1,52 @@
+{
+  "name": "dagora",
+  "version": "0.0.1",
+  "description": "A decentralized marketplace built on Ethereum",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dsystems-io/dAgora.git"
+  },
+  "keywords": [
+    "ethereum"
+  ],
+  "author": "Paul Szczesny",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dsystems-io/dAgora/issues"
+  },
+  "homepage": "https://github.com/dsystems-io/dAgora#readme",
+  "dependencies": {
+    "autoprefixer-loader": "^3.2.0",
+    "babel-core": "^6.13.2",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-react": "^6.11.1",
+    "bluebird": "^3.4.1",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.23.1",
+    "ether-pudding": "^3.1.2",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "json-loader": "^0.5.4",
+    "lodash": "^4.14.1",
+    "node-sass": "^3.8.0",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.6.1",
+    "redux": "^3.5.2",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.1",
+    "web3": "^0.17.0-alpha",
+    "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "babel-preset-stage-0": "^6.5.0"
+  }
+}

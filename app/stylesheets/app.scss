@@ -1,5 +1,6 @@
 body {
   font-family: "Open Sans", sans-serif;
+  height: 100%;
 }
 
 label {
@@ -36,7 +37,7 @@ h3 {
   font-size: 24px;
 }
 
-.site {
+#site-content {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
@@ -116,9 +117,9 @@ h3 {
 	width: 100%;
 	text-align: left;
 	font: normal 16px sans-serif;
-
 	padding: 30px 40px;
-	margin-top: 80px;
+  margin-top: 80px;
+  height: 100px;
 }
 
 .footer-distributed .footer-left p{

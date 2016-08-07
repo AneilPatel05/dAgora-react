@@ -106,33 +106,7 @@
 
 	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
 
-	    _this2.getProductList = function () {
-	      var _dphList = [];
-	      var _products = [];
-	      var _this = _this2;
-	      _this2.state.dAgora.productCount.call().then(function (result) {
-	        console.log(parseInt(result));
-	        for (var i = 1; i <= parseInt(result); i++) {
-	          _dphList.push(_this.state.dAgora.productMap.call(i));
-	        }
-	        return Promise.all(_dphList).then(function (dphArray) {
-	          console.log(dphArray);
-	          dphArray.forEach(function (dphCode) {
-	            _products.push(_this.state.dAgora.productList.call(dphCode));
-	          });
-	          return Promise.all(_products).then(function (productArray) {
-	            console.log(productArray);
-	            _this.setState({ productList: productArray });
-	          }).catch(function (e) {
-	            console.error(e);
-	          });
-	        }).catch(function (e) {
-	          console.error(e);
-	        });
-	      }).catch(function (e) {
-	        console.error(e);
-	      });
-	    };
+	    _initialiseProps.call(_this2);
 
 	    _this2.state = {
 	      dAgora: _dAgoraSol2.default.deployed(),
@@ -140,10 +114,16 @@
 	      accountBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_web3Helper2.default.eth.defaultAccount), "ether").toFixed(5) + " ETH",
 	      contractAddress: _dAgoraSol2.default.deployed().address,
 	      contractBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_dAgoraSol2.default.deployed().address), "ether").toFixed(5),
-	      productList: []
+	      productList: [],
+	      isAdmin: false
 	    };
+	    var _this = _this2;
+	    _dAgoraSol2.default.deployed().admin.call().then(function (result) {
+	      if (result == _web3Helper2.default.eth.defaultAccount) _this.setState({ isAdmin: true });
+	    }).catch(function (e) {
+	      console.error(e);
+	    });;
 	    _this2.getProductList();
-	    console.log(_this2.state.dAgora);
 	    return _this2;
 	  }
 
@@ -152,13 +132,13 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { id: 'site-content' },
 	        _react2.default.createElement(_Navigation2.default, { accountBalance: this.state.accountBalance }),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'container site-content' },
 	          _react2.default.createElement(_status2.default, null),
-	          _react2.default.createElement(_home2.default, { dAgora: this.state.dAgora, productList: this.state.productList })
+	          _react2.default.createElement(_home2.default, { dAgora: this.state.dAgora, productList: this.state.productList, isAdmin: this.state.isAdmin })
 	        ),
 	        _react2.default.createElement(_Footer2.default, { contractAddress: this.state.contractAddress, contractBalance: this.state.contractBalance })
 	      );
@@ -171,7 +151,38 @@
 	// This component's generated HTML and put it on the page (in the DOM)
 
 
-	_reactDom2.default.render(_react2.default.createElement(App, null), document.querySelector('#site-content'));
+	var _initialiseProps = function _initialiseProps() {
+	  var _this3 = this;
+
+	  this.getProductList = function () {
+	    var _dphList = [];
+	    var _products = [];
+	    var _this = _this3;
+	    _this3.state.dAgora.productCount.call().then(function (result) {
+	      for (var i = 1; i <= parseInt(result); i++) {
+	        _dphList.push(_this.state.dAgora.productMap.call(i));
+	      }
+	      return Promise.all(_dphList).then(function (dphArray) {
+	        //console.log(dphArray);
+	        dphArray.forEach(function (dphCode) {
+	          _products.push(_this.state.dAgora.productList.call(dphCode));
+	        });
+	        return Promise.all(_products).then(function (productArray) {
+	          //console.log(productArray);
+	          _this.setState({ productList: productArray });
+	        }).catch(function (e) {
+	          console.error(e);
+	        });
+	      }).catch(function (e) {
+	        console.error(e);
+	      });
+	    }).catch(function (e) {
+	      console.error(e);
+	    });
+	  };
+	};
+
+	_reactDom2.default.render(_react2.default.createElement(App, null), document.querySelector('.site'));
 
 	/**
 	 * Set a message in the status bar
@@ -66624,6 +66635,10 @@
 
 	var _Dashboard2 = _interopRequireDefault(_Dashboard);
 
+	var _web3Helper = __webpack_require__(247);
+
+	var _web3Helper2 = _interopRequireDefault(_web3Helper);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Home = function Home(props) {
@@ -66641,7 +66656,7 @@
 	      )
 	    ),
 	    _react2.default.createElement(_ProductList2.default, { productList: props.productList, dAgora: props.dAgora }),
-	    _react2.default.createElement(_Dashboard2.default, { dAgora: props.dAgora })
+	    props.isAdmin ? _react2.default.createElement(_Dashboard2.default, { dAgora: props.dAgora }) : null
 	  );
 	};
 

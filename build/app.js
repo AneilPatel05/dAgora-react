@@ -68,9 +68,9 @@
 
 	var _web3Helper2 = _interopRequireDefault(_web3Helper);
 
-	var _dAgoraSol = __webpack_require__(333);
+	var _dAgoraShopSol = __webpack_require__(333);
 
-	var _dAgoraSol2 = _interopRequireDefault(_dAgoraSol);
+	var _dAgoraShopSol2 = _interopRequireDefault(_dAgoraShopSol);
 
 	var _Navigation = __webpack_require__(334);
 
@@ -84,7 +84,7 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _Footer = __webpack_require__(343);
+	var _Footer = __webpack_require__(344);
 
 	var _Footer2 = _interopRequireDefault(_Footer);
 
@@ -95,8 +95,10 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	//import dAgora from '../../build/contracts/dAgora.sol.js';
 
-	_dAgoraSol2.default.setProvider(_web3Helper2.default.currentProvider);
+
+	_dAgoraShopSol2.default.setProvider(_web3Helper2.default.currentProvider);
 
 	var App = function (_Component) {
 	  _inherits(App, _Component);
@@ -109,21 +111,23 @@
 	    _initialiseProps.call(_this2);
 
 	    _this2.state = {
-	      dAgora: _dAgoraSol2.default.deployed(),
+	      dAgora: _dAgoraShopSol2.default.deployed(),
 	      defaultAccount: _web3Helper2.default.eth.defaultAccount,
 	      accountBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_web3Helper2.default.eth.defaultAccount), "ether").toFixed(5) + " ETH",
-	      contractAddress: _dAgoraSol2.default.deployed().address,
-	      contractBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_dAgoraSol2.default.deployed().address), "ether").toFixed(5),
+	      contractAddress: _dAgoraShopSol2.default.deployed().address,
+	      contractBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_dAgoraShopSol2.default.deployed().address), "ether").toFixed(5),
 	      productList: [],
 	      isAdmin: false
 	    };
 	    var _this = _this2;
-	    _dAgoraSol2.default.deployed().admin.call().then(function (result) {
+	    _this2.state.dAgora.owner.call().then(function (result) {
+	      //console.log(result);
 	      if (result == _web3Helper2.default.eth.defaultAccount) _this.setState({ isAdmin: true });
+	      return result;
 	    }).catch(function (e) {
 	      console.error(e);
 	    });;
-	    _this2.getProductList();
+	    _this2.getInitialProducts();
 	    return _this2;
 	  }
 
@@ -154,21 +158,49 @@
 	var _initialiseProps = function _initialiseProps() {
 	  var _this3 = this;
 
-	  this.getProductList = function () {
-	    var _dphList = [];
-	    var _products = [];
+	  this.getInitialProducts = function () {
+	    var _gpcList = [];
 	    var _this = _this3;
-	    _this3.state.dAgora.productCount.call().then(function (result) {
-	      for (var i = 1; i <= parseInt(result); i++) {
-	        _dphList.push(_this.state.dAgora.productMap.call(i));
+
+	    _this3.state.dAgora.getGpcLength.call().then(function (result) {
+	      for (var i = 0; i < parseInt(result); i++) {
+	        _gpcList.push(_this.state.dAgora.gpcList.call(i));
+	      }
+	      return Promise.all(_gpcList).then(function (gpcArray) {
+	        //console.log(gpcArray);
+	        _this.setState({ gpcList: gpcArray });
+	        for (var i = 0; i < gpcArray.length; i++) {
+	          _this.getProductsByGpc(gpcArray[i], true);
+	        }
+	        return null;
+	      });
+	    }).catch(function (e) {
+	      console.error(e);
+	    });
+	  };
+
+	  this.getProductsByGpc = function (gpcSegment) {
+	    var concat = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+	    var _this = _this3;
+	    _this.state.dAgora.getProductCount.call(gpcSegment).then(function (result) {
+	      //console.log("Segment #" + gpcArray[0] + " Count:" + parseInt(result));
+	      var _dphList = [];
+	      for (var i = 0; i < parseInt(result); i++) {
+	        _dphList.push(_this.state.dAgora.productCategoryMap.call(gpcSegment, i));
 	      }
 	      return Promise.all(_dphList).then(function (dphArray) {
 	        //console.log(dphArray);
-	        dphArray.forEach(function (dphCode) {
-	          _products.push(_this.state.dAgora.productList.call(dphCode));
-	        });
+	        var _products = [];
+	        for (var i = 0; i < dphArray.length; i++) {
+	          _products.push(_this.state.dAgora.productMap.call(dphArray[i]));
+	        }
 	        return Promise.all(_products).then(function (productArray) {
 	          //console.log(productArray);
+	          if (concat) {
+	            var currentProductList = _this.state.productList;
+	            productArray = currentProductList.concat(productArray);
+	          }
 	          _this.setState({ productList: productArray });
 	        }).catch(function (e) {
 	          console.error(e);
@@ -66086,13 +66118,13 @@
 
 	  Contract.new = function () {
 	    if (this.currentProvider == null) {
-	      throw new Error("dAgora error: Please call setProvider() first before calling new().");
+	      throw new Error("dAgoraShop error: Please call setProvider() first before calling new().");
 	    }
 
 	    var args = Array.prototype.slice.call(arguments);
 
 	    if (!this.unlinked_binary) {
-	      throw new Error("dAgora error: contract binary not set. Can't deploy new instance.");
+	      throw new Error("dAgoraShop error: contract binary not set. Can't deploy new instance.");
 	    }
 
 	    var regex = /__[^_]+_+/g;
@@ -66111,7 +66143,7 @@
 	        return name != arr[index + 1];
 	      }).join(", ");
 
-	      throw new Error("dAgora contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of dAgora: " + unlinked_libraries);
+	      throw new Error("dAgoraShop contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of dAgoraShop: " + unlinked_libraries);
 	    }
 
 	    var self = this;
@@ -66152,7 +66184,7 @@
 
 	  Contract.at = function (address) {
 	    if (address == null || typeof address != "string" || address.length != 42) {
-	      throw new Error("Invalid address passed to dAgora.at(): " + address);
+	      throw new Error("Invalid address passed to dAgoraShop.at(): " + address);
 	    }
 
 	    var contract_class = this.web3.eth.contract(this.abi);
@@ -66163,7 +66195,7 @@
 
 	  Contract.deployed = function () {
 	    if (!this.address) {
-	      throw new Error("Cannot find deployed address: dAgora not deployed or address not set.");
+	      throw new Error("Cannot find deployed address: dAgoraShop not deployed or address not set.");
 	    }
 
 	    return this.at(this.address);
@@ -66204,21 +66236,18 @@
 	  Contract.all_networks = {
 	    "default": {
 	      "abi": [{
-	        "constant": false,
-	        "inputs": [],
-	        "name": "removeProduct",
-	        "outputs": [],
-	        "type": "function"
-	      }, {
 	        "constant": true,
 	        "inputs": [{
 	          "name": "",
 	          "type": "bytes32"
 	        }],
-	        "name": "productList",
+	        "name": "productMap",
 	        "outputs": [{
 	          "name": "dph",
 	          "type": "bytes32"
+	        }, {
+	          "name": "shop",
+	          "type": "address"
 	        }, {
 	          "name": "title",
 	          "type": "string"
@@ -66234,6 +66263,48 @@
 	        }, {
 	          "name": "stock",
 	          "type": "uint256"
+	        }, {
+	          "name": "created",
+	          "type": "uint256"
+	        }],
+	        "type": "function"
+	      }, {
+	        "constant": true,
+	        "inputs": [{
+	          "name": "",
+	          "type": "uint256"
+	        }, {
+	          "name": "",
+	          "type": "uint256"
+	        }],
+	        "name": "productCategoryMap",
+	        "outputs": [{
+	          "name": "",
+	          "type": "bytes32"
+	        }],
+	        "type": "function"
+	      }, {
+	        "constant": false,
+	        "inputs": [{
+	          "name": "orderId",
+	          "type": "bytes32"
+	        }, {
+	          "name": "newStatus",
+	          "type": "uint8"
+	        }],
+	        "name": "updateOrderStatus",
+	        "outputs": [],
+	        "type": "function"
+	      }, {
+	        "constant": false,
+	        "inputs": [{
+	          "name": "gpcSegment",
+	          "type": "uint256"
+	        }],
+	        "name": "hasGpc",
+	        "outputs": [{
+	          "name": "exists",
+	          "type": "bool"
 	        }],
 	        "type": "function"
 	      }, {
@@ -66243,30 +66314,81 @@
 	        "outputs": [],
 	        "type": "function"
 	      }, {
-	        "constant": false,
-	        "inputs": [{
-	          "name": "customer",
+	        "constant": true,
+	        "inputs": [],
+	        "name": "dAgora",
+	        "outputs": [{
+	          "name": "",
 	          "type": "address"
-	        }, {
-	          "name": "orderIndex",
-	          "type": "uint256"
-	        }, {
-	          "name": "newStatus",
-	          "type": "uint8"
 	        }],
-	        "name": "updateOrderStatus",
-	        "outputs": [],
+	        "type": "function"
+	      }, {
+	        "constant": true,
+	        "inputs": [{
+	          "name": "",
+	          "type": "uint256"
+	        }],
+	        "name": "orderList",
+	        "outputs": [{
+	          "name": "",
+	          "type": "bytes32"
+	        }],
 	        "type": "function"
 	      }, {
 	        "constant": true,
 	        "inputs": [{
 	          "name": "",
 	          "type": "address"
+	        }, {
+	          "name": "",
+	          "type": "uint256"
 	        }],
-	        "name": "orderCount",
+	        "name": "customerOrderMap",
+	        "outputs": [{
+	          "name": "",
+	          "type": "bytes32"
+	        }],
+	        "type": "function"
+	      }, {
+	        "constant": true,
+	        "inputs": [],
+	        "name": "owner",
+	        "outputs": [{
+	          "name": "",
+	          "type": "address"
+	        }],
+	        "type": "function"
+	      }, {
+	        "constant": true,
+	        "inputs": [{
+	          "name": "",
+	          "type": "uint256"
+	        }],
+	        "name": "gpcList",
 	        "outputs": [{
 	          "name": "",
 	          "type": "uint256"
+	        }],
+	        "type": "function"
+	      }, {
+	        "constant": false,
+	        "inputs": [{
+	          "name": "dph",
+	          "type": "bytes32"
+	        }, {
+	          "name": "description",
+	          "type": "string"
+	        }, {
+	          "name": "price",
+	          "type": "uint256"
+	        }, {
+	          "name": "stock",
+	          "type": "uint256"
+	        }],
+	        "name": "updateProduct",
+	        "outputs": [{
+	          "name": "success",
+	          "type": "bool"
 	        }],
 	        "type": "function"
 	      }, {
@@ -66281,25 +66403,55 @@
 	      }, {
 	        "constant": false,
 	        "inputs": [{
-	          "name": "productDph",
+	          "name": "dph",
 	          "type": "bytes32"
-	        }, {
-	          "name": "newStock",
+	        }],
+	        "name": "removeProduct",
+	        "outputs": [],
+	        "type": "function"
+	      }, {
+	        "constant": false,
+	        "inputs": [{
+	          "name": "gpcSegment",
 	          "type": "uint256"
 	        }],
-	        "name": "updateProductStock",
-	        "outputs": [],
+	        "name": "getProductCount",
+	        "outputs": [{
+	          "name": "count",
+	          "type": "uint256"
+	        }],
 	        "type": "function"
 	      }, {
 	        "constant": true,
 	        "inputs": [{
 	          "name": "",
-	          "type": "uint256"
-	        }],
-	        "name": "productMap",
-	        "outputs": [{
-	          "name": "",
 	          "type": "bytes32"
+	        }],
+	        "name": "orderMap",
+	        "outputs": [{
+	          "name": "id",
+	          "type": "bytes32"
+	        }, {
+	          "name": "shop",
+	          "type": "address"
+	        }, {
+	          "name": "customer",
+	          "type": "address"
+	        }, {
+	          "name": "totalCost",
+	          "type": "uint256"
+	        }, {
+	          "name": "dph",
+	          "type": "bytes32"
+	        }, {
+	          "name": "status",
+	          "type": "uint8"
+	        }, {
+	          "name": "created",
+	          "type": "uint256"
+	        }, {
+	          "name": "updated",
+	          "type": "uint256"
 	        }],
 	        "type": "function"
 	      }, {
@@ -66322,16 +66474,16 @@
 	        }],
 	        "name": "addProduct",
 	        "outputs": [{
-	          "name": "success",
-	          "type": "bool"
+	          "name": "dph",
+	          "type": "bytes32"
 	        }],
 	        "type": "function"
 	      }, {
-	        "constant": true,
+	        "constant": false,
 	        "inputs": [],
-	        "name": "productCount",
+	        "name": "getGpcLength",
 	        "outputs": [{
-	          "name": "",
+	          "name": "lenght",
 	          "type": "uint256"
 	        }],
 	        "type": "function"
@@ -66348,49 +66500,13 @@
 	        "outputs": [],
 	        "type": "function"
 	      }, {
-	        "constant": true,
-	        "inputs": [{
-	          "name": "",
-	          "type": "address"
-	        }, {
-	          "name": "",
-	          "type": "uint256"
-	        }],
-	        "name": "orderList",
-	        "outputs": [{
-	          "name": "id",
-	          "type": "uint256"
-	        }, {
-	          "name": "customer",
-	          "type": "address"
-	        }, {
-	          "name": "totalCost",
-	          "type": "uint256"
-	        }, {
-	          "name": "dph",
-	          "type": "bytes32"
-	        }, {
-	          "name": "status",
-	          "type": "uint8"
-	        }],
-	        "type": "function"
-	      }, {
-	        "constant": true,
-	        "inputs": [],
-	        "name": "admin",
-	        "outputs": [{
-	          "name": "",
-	          "type": "address"
-	        }],
-	        "type": "function"
-	      }, {
 	        "inputs": [],
 	        "type": "constructor"
 	      }],
-	      "unlinked_binary": "0x606060405260008054600160a060020a0319163317815560035561085a806100276000396000f3606060405236156100a35760e060020a60003504630177b55681146100a55780632aa0a2ab146100c457806341c0e1b5146100f7578063526fa1d514610116578063713d856b1461013e5780639c9a106114610156578063a30f30e61461017d578063d7f0719d146101a2578063dc60d3d2146101ba578063e0f6ef871461026c578063f3fef3a314610275578063f4fb9b2f14610299578063f851a440146102e6575b005b6100a3600054600160a060020a03908116339091161461049257610002565b6001602081905260048035600090815260409020805491810154600382015460058301546102f895840193600201929086565b6100a3600054600160a060020a03908116339091161461049457610002565b6100a3600435602435604435600054600160a060020a0390811633909116146104a257610002565b61041b60043560056020526000908152604090205481565b6100a36004356000818152600160205260408120600401549034829010156104d657610002565b6100a3600435602435600054600160a060020a0390811633909116146105c957610002565b61041b60043560026020526000908152604090205481565b61042d6004808035906020019082018035906020019191908080601f01602080910402602001604051908101604052809392919081815260200183838082843750506040805160208835808b0135601f81018390048302840183019094528383529799986044989297509190910194509092508291508401838280828437509496505093359350506064359150506084356000805481908190600160a060020a0390811633909116146105e257610002565b61041b60035481565b6100a360043560243560005433600160a060020a0390811691161461082f57610002565b6004602081815281356000908152604080822090925260243581522080546001820154600283015460038401549390940154610441949293600160a060020a039290921692919060ff1685565b610475600054600160a060020a031681565b60408051878152606081018590526080810184905260a0810183905260c060208201818152885460026001821615610100026000190190911604918301829052919283019060e0840190899080156103915780601f1061036657610100808354040283529160200191610391565b820191906000526020600020905b81548152906001019060200180831161037457829003601f168201915b5050838103825287546002600182161561010002600019019091160480825260209190910190889080156104065780601f106103db57610100808354040283529160200191610406565b820191906000526020600020905b8154815290600101906020018083116103e957829003601f168201915b50509850505050505050505060405180910390f35b60408051918252519081900360200190f35b604080519115158252519081900360200190f35b60408051958652600160a060020a039490941660208601528484019290925260608401526080830152519081900360a00190f35b60408051600160a060020a03929092168252519081900360200190f35b565b600054600160a060020a0316ff5b600160a060020a038316600090815260046020818152604080842086855290915290912001805460ff191682179055505050565b8134111561050c5760405133600160a060020a031690600090348590039082818181858883f19350505050151561050c57610002565b5033600160a060020a03811660008181526005602081815260408084208054825160a0810184526001918201808252818601998a528185019a8b52606082018c8152608083018981529989526004808852868a20928a52918752858920925183559951828401805473ffffffffffffffffffffffffffffffffffffffff191690911790559951600282015597516003890155955196909701805460ff19169096179095558554840190955594815292529020018054600019019055565b60008281526001602052604090206005018190555b5050565b878633604051808480519060200190808383829060006004602084601f0104600f02600301f15090500183815260200182600160a060020a03166c0100000000000000000000000002815260140193505050506040518091039020915060036000505460010190508060036000508190555081600260005060008381526020019081526020016000206000508190555060c060405190810160405280838152602001898152602001888152602001878152602001868152602001858152602001506001600050600084600019168152602001908152602001600020600050600082015181600001600050556020820151816001016000509080519060200190828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061073a57805160ff19168380011785555b5061076a9291505b808211156107c95760008155600101610726565b8280016001018555821561071e579182015b8281111561071e57825182600050559160200191906001019061074c565b50506040820151816002016000509080519060200190828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106107cd57805160ff19168380011785555b506107fd929150610726565b5090565b828001600101855582156107bd579182015b828111156107bd5782518260005055916020019190600101906107df565b5050606082015160038201556080820151600482015560a0919091015160059190910155506001979650505050505050565b604051600160a060020a03831690600090839082818181858883f1935050505015156105de5761000256",
-	      "updated_at": 1470526362791,
-	      "links": {},
-	      "address": "0x03330b8db284117f366ed3b20fbb41c33c1d9834"
+	      "unlinked_binary": "0x606060405260008054600160a060020a03191633179055610e81806100246000396000f3606060405236156100da5760e060020a6000350463100b6ba281146100dc57806310b450141461012857806312d35eed1461015b5780632847fd0a1461018057806341c0e1b5146101dd5780636ea4516d146101fc57806376f75e7f1461020e5780638aff40681461024b5780638da5cb5b1461027e5780638f69da3714610290578063946f9005146102cd5780639c9a10611461033b578063a26ea49614610362578063ad4891ee14610389578063bef56e53146103a3578063dc60d3d2146103fb578063ec31eee6146104ab578063f3fef3a3146104c1575b005b600360208190526004803560009081526040902080549181015460058201546001830154600684015460078501546104e597600160a060020a0393909316956002810195930193919088565b6104af60043560243560046020526000828152604090208054829081101561000257506000908152602090200154905081565b6100da600435602435600054600160a060020a03908116339091161461069f57610002565b6106216004355b6000805b6002548110156106ca57826002600050828154811015610002576000919091527f405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace015414156106d557600191506106cf565b6100da600054600160a060020a0390811633909116146106dd57610002565b610635600154600160a060020a031681565b6104af60043560078054829081101561000257506000527fa66cc928b5edb82af9bd49922954155ab7b0942694bea4ce44661d9a8736c688015481565b6104af60043560243560066020526000828152604090208054829081101561000257506000908152602090200154905081565b610635600054600160a060020a031681565b6104af60043560028054829081101561000257506000527f405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace015481565b60408051602060248035600481810135601f81018590048502860185019096528585526106219581359591946044949293909201918190840183828082843750949650509335935050606435915050600080548190600160a060020a0390811633909116146106eb57610002565b6100da6004356000818152600360205260408120600501549034829010156107b357610002565b6100da6004356000805481908190600160a060020a03908116339091161461099557610002565b6104af600435600081815260046020526040902054919050565b60056020819052600480356000908152604090208054918101546003820154938201546001830154600284015460068501546007959095015461065297600160a060020a03938416969290931694929360ff16919088565b6104af6004808035906020019082018035906020019191908080601f01602080910402602001604051908101604052809392919081815260200183838082843750506040805160208835808b0135601f8101839004830284018301909452838352979998604498929750919091019450909250829150840183828082843750949650509335935050606435915050608435600080548190600160a060020a039081163390911614610b5857610002565b6002545b60408051918252519081900360200190f35b6100da60043560243560005433600160a060020a03908116911614610e5657610002565b60408051898152600160a060020a03891660208201526080810186905260a0810185905260c0810184905260e0810183905261010091810182815288546002600182161585026000190190911604928201839052909160608301906101208401908a9080156105955780601f1061056a57610100808354040283529160200191610595565b820191906000526020600020905b81548152906001019060200180831161057857829003601f168201915b50508381038252885460026001821615610100026000190190911604808252602091909101908990801561060a5780601f106105df5761010080835404028352916020019161060a565b820191906000526020600020905b8154815290600101906020018083116105ed57829003601f168201915b50509a505050505050505050505060405180910390f35b604080519115158252519081900360200190f35b60408051600160a060020a03929092168252519081900360200190f35b60408051988952600160a060020a0397881660208a015295909616878601526060870193909352608086019190915260a085015260c084015260e083019190915251908190036101000190f35b6000828152600560208190526040909120908101805460ff19168317905542600791909101555b5050565b600091505b50919050565b60010161018b565b600054600160a060020a0316ff5b506000858152600360208181526040832087519281018054818652948390209194909360026001831615610100026000190190921691909104601f9081018490048301939192918a019083901061076557805160ff19168380011785555b506107959291505b808211156107af5760008155600101610751565b82800160010185558215610749579182015b82811115610749578251826000505591602001919060010190610777565b505060058101939093555060069190910155506001919050565b5090565b813411156107e95760405133600160a060020a031690600090348590039082818181858883f1935050505015156107e957610002565b50604080518381526c0100000000000000000000000033600160a060020a0381811683810260208681019190915230928316949094026034860152426048860181905286519586900360680186206101008701885280875286860193845286880194855260608701898152608088018b8152600060a08a0181815260c08b0186815260e08c019687528583526005808c528d84209c518d55985160018d8101805473ffffffffffffffffffffffffffffffffffffffff1990811690931790559a5160028e018054909216179055935160038c0155915160048b01559051958901805460ff1916909617909555516006888101919091559151600797909701969096559082529092529290208054928301808255919290918281838015829011610925578183600052602060002091820191016109259190610751565b50505060009283525060209091200181905560078054600181018083558281838015829011610967578183600052602060002091820191016109679190610751565b5050506000928352506020808320909101929092559283526003905250604090206006018054600019019055565b5050506000818152600360205260408120600481015490915b600082815260046020526040902054811015610a6d57604060002080548591908390811015610002576000918252602090912001541415610b145760008281526004602052604090208054600019810190811015610002579060005260206000209001600050546000838152600460205260409020805483908110156100025790600052602060002090016000505560008281526004602052604090208054600019810190811015610002579060005260206000209001600050600090555b60008481526003602052604081208181556001818101805473ffffffffffffffffffffffffffffffffffffffff1916905560028281018054858255939493909281161561010002600019011604601f819010610b1c57505b5060038201600050805460018160011615610100020316600290046000825580601f10610b3a57505b505060006004820181905560058201819055600682018190556007919091015550505050565b6001016109ae565b601f016020900490600052602060002090810190610ac59190610751565b601f016020900490600052602060002090810190610aee9190610751565b868530604051808480519060200190808383829060006004602084601f0104600f02600301f15090500183815260200182600160a060020a03166c01000000000000000000000000028152601401935050505060405180910390209050610100604051908101604052808281526020013081526020018881526020018781526020018681526020018581526020018481526020014281526020015060036000506000836000191681526020019081526020016000206000506000820151816000016000505560208201518160010160006101000a815481600160a060020a03021916908302179055506040820151816002016000509080519060200190828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f10610c9e57805160ff19168380011785555b50610cce929150610751565b82800160010185558215610c92579182015b82811115610c92578251826000505591602001919060010190610cb0565b50506060820151816003016000509080519060200190828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f10610d2d57805160ff19168380011785555b50610d5d929150610751565b82800160010185558215610d21579182015b82811115610d21578251826000505591602001919060010190610d3f565b5050608082015160048281019190915560a0830151600583015560c0830151600683015560e09290920151600791909101556000868152602091909152604090208054600181018083558281838015829011610dcc57818360005260206000209182019101610dcc9190610751565b505050600092835250602090912001819055610de785610187565b1515610e4c5760028054600181018083558281838015829011610e39576000839052610e39907f405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace908101908301610751565b5050506000928352506020909120018590555b9695505050505050565b604051600160a060020a03831690600090839082818181858883f1935050505015156106c65761000256",
+	      "updated_at": 1470643315099,
+	      "address": "0x301a9b5fd21057cd895a00d45e543b4822732d19",
+	      "links": {}
 	    }
 	  };
 
@@ -66456,7 +66572,7 @@
 	    Contract.links[name] = address;
 	  };
 
-	  Contract.contract_name = Contract.prototype.contract_name = "dAgora";
+	  Contract.contract_name = Contract.prototype.contract_name = "dAgoraShop";
 	  Contract.generated_with = Contract.prototype.generated_with = "3.1.2";
 
 	  var properties = {
@@ -66493,7 +66609,7 @@
 	  } else {
 	    // There will only be one version of this contract in the browser,
 	    // and we can use that.
-	    window.dAgora = Contract;
+	    window.dAgoraShop = Contract;
 	  }
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -66683,7 +66799,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProductList = function ProductList(props) {
-	  console.log(props.productList);
+	  //console.log(props.productList);
 	  if (props.productList.length < 1) {
 	    return _react2.default.createElement(
 	      'div',
@@ -66693,7 +66809,7 @@
 	  }
 
 	  var ProductItems = props.productList.map(function (product) {
-	    console.log(product[0]);
+	    //console.log(product[0]);
 	    return _react2.default.createElement(_Product2.default, { key: product[0], product: product, dAgora: props.dAgora });
 	  });
 
@@ -66754,19 +66870,19 @@
 	              'span',
 	              null,
 	              'Ξ ',
-	              _web3Helper2.default.fromWei(parseFloat(_this.state.product[4]), "ether")
+	              _web3Helper2.default.fromWei(parseFloat(_this.state.product[5]), "ether")
 	            )
 	          ),
 	          _react2.default.createElement('img', { src: 'https://placeimg.com/150/150/any', className: 'img-rounded hvr-grow' }),
 	          _react2.default.createElement(
 	            'h3',
 	            null,
-	            _this.state.product[1]
+	            _this.state.product[2]
 	          ),
 	          _react2.default.createElement(
 	            'h4',
 	            null,
-	            _this.state.product[2]
+	            _this.state.product[3]
 	          ),
 	          _react2.default.createElement(
 	            'h6',
@@ -66777,7 +66893,7 @@
 	              'Stock'
 	            ),
 	            ': ',
-	            parseFloat(_this.state.product[5])
+	            parseFloat(_this.state.product[6])
 	          ),
 	          _react2.default.createElement(
 	            'p',
@@ -66798,9 +66914,9 @@
 	      event.preventDefault();
 	      var da = _this.state.dAgora;
 	      var _product = _this.state.product;
-	      da.productList.call(_product[0]).then(function (product) {
-	        console.log(product);
-	        return da.buy(_product[0], { from: _web3Helper2.default.eth.defaultAccount, gas: 3000000, value: parseFloat(product[4]) });
+	      da.productMap.call(_product[0]).then(function (product) {
+	        //console.log(product);
+	        return da.buy(_product[0], { from: _web3Helper2.default.eth.defaultAccount, gas: 3000000, value: parseFloat(product[5]) });
 	      }).then(function (tx_id) {
 	        console.log(tx_id);
 	        return _web3Helper2.default.eth.getTransactionReceiptMined(tx_id);
@@ -66843,7 +66959,11 @@
 
 	var _UpdateProduct2 = _interopRequireDefault(_UpdateProduct);
 
-	var _WithdrawFunds = __webpack_require__(342);
+	var _RemoveProduct = __webpack_require__(342);
+
+	var _RemoveProduct2 = _interopRequireDefault(_RemoveProduct);
+
+	var _WithdrawFunds = __webpack_require__(343);
 
 	var _WithdrawFunds2 = _interopRequireDefault(_WithdrawFunds);
 
@@ -66871,8 +66991,17 @@
 	        null,
 	        _react2.default.createElement(
 	          'a',
-	          { 'data-toggle': 'tab', href: '#update-stock' },
-	          'Update Stock'
+	          { 'data-toggle': 'tab', href: '#update-product' },
+	          'Update Product'
+	        )
+	      ),
+	      _react2.default.createElement(
+	        'li',
+	        null,
+	        _react2.default.createElement(
+	          'a',
+	          { 'data-toggle': 'tab', href: '#remove-product' },
+	          'Remove Product'
 	        )
 	      ),
 	      _react2.default.createElement(
@@ -66895,8 +67024,13 @@
 	      ),
 	      _react2.default.createElement(
 	        'div',
-	        { id: 'update-stock', className: 'tab-pane fade' },
+	        { id: 'update-product', className: 'tab-pane fade' },
 	        _react2.default.createElement(_UpdateProduct2.default, { dAgora: props.dAgora })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { id: 'remove-product', className: 'tab-pane fade' },
+	        _react2.default.createElement(_RemoveProduct2.default, { dAgora: props.dAgora })
 	      ),
 	      _react2.default.createElement(
 	        'div',
@@ -67083,6 +67217,157 @@
 	  function UpdateProduct(props) {
 	    _classCallCheck(this, UpdateProduct);
 
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(UpdateProduct).call(this, props));
+
+	    _this2.render = function () {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h1',
+	          { className: 'text-center' },
+	          'Update Product'
+	        ),
+	        _react2.default.createElement(
+	          'form',
+	          { className: 'col-md-6 col-md-offset-3' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group col-md-9' },
+	            _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'dphCode', value: _this2.state.dphCode, id: 'dphCode', placeholder: 'DPH Code (0x....)', onChange: _this2.bindState('dphCode') })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-md-3' },
+	            _react2.default.createElement(
+	              'button',
+	              { type: 'button', className: 'btn btn-success', onClick: function onClick(event) {
+	                  return _this2.loadProduct(event);
+	                } },
+	              'Load...'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group col-md-6' },
+	            _react2.default.createElement(
+	              'label',
+	              { className: 'sr-only', htmlFor: 'price' },
+	              'Price (in Ether)'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'input-group' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'input-group-addon' },
+	                'Ξ'
+	              ),
+	              _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'price', value: _this2.state.price, id: 'price', placeholder: 'Price (Ether)', onChange: _this2.bindState('price') })
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group col-md-6' },
+	            _react2.default.createElement('input', { type: 'text', className: 'form-control', value: _this2.state.stock, id: 'stock', name: 'stock', placeholder: 'New Stock Amount', onChange: _this2.bindState('stock') })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group col-md-12' },
+	            _react2.default.createElement(
+	              'textarea',
+	              { className: 'form-control', id: 'description', name: 'description', rows: '4', placeholder: 'Description', value: _this2.state.description, onChange: _this2.bindState('description') },
+	              _this2.state.description
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-md-12' },
+	            _react2.default.createElement(
+	              'button',
+	              { type: 'button', id: 'updateStockButton', className: 'btn btn-primary', onClick: function onClick(event) {
+	                  return _this2.handleSubmit(event);
+	                } },
+	              'Update'
+	            )
+	          )
+	        )
+	      );
+	    };
+
+	    _this2.bindState = function (property) {
+	      return function (event) {
+	        _this2.setState(_defineProperty({}, property, event.target.value));
+	      };
+	    };
+
+	    _this2.loadProduct = function (event) {
+	      event.preventDefault();
+	      var _this = _this2;
+	      _this2.state.dAgora.productMap.call(_this2.state.dphCode).then(function (result) {
+	        console.log(result);
+	        _this.setState({ price: _web3Helper2.default.fromWei(result[5], "ether"), stock: result[6], description: result[3] });
+	      }).catch(function (e) {
+	        console.error(e);
+	      });
+	    };
+
+	    _this2.handleSubmit = function (event) {
+	      event.preventDefault();
+	      var da = _this2.state.dAgora;
+	      da.updateProduct(_this2.state.dphCode, _this2.state.description, _web3Helper2.default.toWei(parseFloat(_this2.state.price), "ether"), parseInt(_this2.state.stock), { from: _web3Helper2.default.eth.defaultAccount, gas: 3000000 }).then(function (tx_id) {
+	        console.log(tx_id);
+	        return _web3Helper2.default.eth.getTransactionReceiptMined(tx_id);
+	      }).then(function (receipt) {
+	        console.log(receipt);
+	      }).catch(function (e) {
+	        console.log(e);
+	      });
+	    };
+
+	    _this2.state = { dAgora: props.dAgora };
+	    return _this2;
+	  }
+
+	  return UpdateProduct;
+	}(_react.Component);
+
+	exports.default = UpdateProduct;
+
+/***/ },
+/* 342 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _web3Helper = __webpack_require__(247);
+
+	var _web3Helper2 = _interopRequireDefault(_web3Helper);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var UpdateProduct = function (_Component) {
+	  _inherits(UpdateProduct, _Component);
+
+	  function UpdateProduct(props) {
+	    _classCallCheck(this, UpdateProduct);
+
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UpdateProduct).call(this, props));
 
 	    _this.render = function () {
@@ -67092,27 +67377,26 @@
 	        _react2.default.createElement(
 	          'h1',
 	          { className: 'text-center' },
-	          'Update Product Stock'
+	          'Remove Product'
 	        ),
 	        _react2.default.createElement(
 	          'form',
 	          { className: 'col-md-6 col-md-offset-3' },
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'form-group' },
+	            { className: 'form-group col-md-9' },
 	            _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'dphCode', id: 'dphCode', placeholder: 'DPH Code (0x....)', onChange: _this.bindState('dphCode') })
 	          ),
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'form-group' },
-	            _react2.default.createElement('input', { type: 'text', className: 'form-control', id: 'stock', name: 'stock', placeholder: 'New Stock Amount', onChange: _this.bindState('stock') })
-	          ),
-	          _react2.default.createElement(
-	            'button',
-	            { type: 'button', id: 'updateStockButton', className: 'btn btn-primary', onClick: function onClick(event) {
-	                return _this.handleSubmit(event);
-	              } },
-	            'Update'
+	            { className: 'col-md-3' },
+	            _react2.default.createElement(
+	              'button',
+	              { type: 'button', id: 'removeProductButton', className: 'btn btn-danger', onClick: function onClick(event) {
+	                  return _this.handleSubmit(event);
+	                } },
+	              'Remove'
+	            )
 	          )
 	        )
 	      );
@@ -67127,7 +67411,7 @@
 	    _this.handleSubmit = function (event) {
 	      event.preventDefault();
 	      var da = _this.state.dAgora;
-	      da.updateProductStock(_this.state.dphCode, _this.state.stock, { from: _web3Helper2.default.eth.defaultAccount, gas: 3000000 }).then(function (tx_id) {
+	      da.removeProduct(_this.state.dphCode, { from: _web3Helper2.default.eth.defaultAccount, gas: 3000000 }).then(function (tx_id) {
 	        console.log(tx_id);
 	        return _web3Helper2.default.eth.getTransactionReceiptMined(tx_id);
 	      }).then(function (receipt) {
@@ -67147,7 +67431,7 @@
 	exports.default = UpdateProduct;
 
 /***/ },
-/* 342 */
+/* 343 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67261,7 +67545,7 @@
 	exports.default = WithdrawFunds;
 
 /***/ },
-/* 343 */
+/* 344 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

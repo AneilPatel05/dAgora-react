@@ -6,8 +6,9 @@ import ReactDOM from 'react-dom';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
 import web3 from './helpers/web3Helper';
-import dAgora from '../../build/contracts/dAgora.sol.js';
-dAgora.setProvider(web3.currentProvider);
+//import dAgora from '../../build/contracts/dAgora.sol.js';
+import dAgoraShop from '../../build/contracts/dAgoraShop.sol.js';
+dAgoraShop.setProvider(web3.currentProvider);
 
 import Navigation from './components/template/Navigation';
 import Status from './components/status';
@@ -18,38 +19,66 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dAgora: dAgora.deployed(),
+      dAgora: dAgoraShop.deployed(),
       defaultAccount: web3.eth.defaultAccount,
       accountBalance: web3.fromWei(web3.eth.getBalance(web3.eth.defaultAccount), "ether").toFixed(5)+ " ETH",
-      contractAddress: dAgora.deployed().address,
-      contractBalance: web3.fromWei(web3.eth.getBalance(dAgora.deployed().address), "ether").toFixed(5),
+      contractAddress: dAgoraShop.deployed().address,
+      contractBalance: web3.fromWei(web3.eth.getBalance(dAgoraShop.deployed().address), "ether").toFixed(5),
       productList: [],
       isAdmin: false
     };
     var _this = this;
-    dAgora.deployed().admin.call().then(function(result) {
+    this.state.dAgora.owner.call().then(function(result) {
+      //console.log(result);
       if(result == web3.eth.defaultAccount) _this.setState({isAdmin: true});
+      return result;
     }).catch(function(e) {
       console.error(e);
     });;
-    this.getProductList();
+    this.getInitialProducts();
   }
 
-  getProductList = () => {
-    var _dphList = [];
-    var _products =[];
+  getInitialProducts = () => {
+    var _gpcList = [];
     var _this = this;
-    this.state.dAgora.productCount.call().then(function (result) {
-      for(var i = 1; i <= parseInt(result); i++) {
-        _dphList.push(_this.state.dAgora.productMap.call(i));
+
+    this.state.dAgora.getGpcLength.call().then(function (result) {
+      for(var i = 0; i < parseInt(result); i++) {
+        _gpcList.push(_this.state.dAgora.gpcList.call(i));
+      }
+      return Promise.all(_gpcList).then(function(gpcArray) {
+        //console.log(gpcArray);
+        _this.setState({gpcList: gpcArray});
+        for(var i = 0; i < gpcArray.length; i++) {
+          _this.getProductsByGpc(gpcArray[i], true);
+        }
+        return null;
+      });
+    }).catch(function(e) {
+      console.error(e);
+    });
+  }
+
+  getProductsByGpc = (gpcSegment, concat=false) => {
+    var _this = this;
+    _this.state.dAgora.getProductCount.call(gpcSegment).then(function(result) {
+      //console.log("Segment #" + gpcArray[0] + " Count:" + parseInt(result));
+      var _dphList = [];
+      for(var i = 0; i < parseInt(result); i++) {
+        _dphList.push(_this.state.dAgora.productCategoryMap.call(gpcSegment, i));
       }
       return Promise.all(_dphList).then(function(dphArray) {
         //console.log(dphArray);
-        dphArray.forEach(function(dphCode) {
-          _products.push(_this.state.dAgora.productList.call(dphCode));
-        });
+        var _products = [];
+        for(var i = 0; i < dphArray.length; i++) {
+          _products.push(_this.state.dAgora.productMap.call(dphArray[i]));
+        }
         return Promise.all(_products).then(function(productArray) {
           //console.log(productArray);
+          if(concat) {
+            var currentProductList = _this.state.productList;
+            productArray = currentProductList.concat(productArray);
+          }
           _this.setState({productList: productArray});
         }).catch(function(e) {
           console.error(e);

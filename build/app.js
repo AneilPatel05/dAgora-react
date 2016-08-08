@@ -72,19 +72,23 @@
 
 	var _dAgoraShopSol2 = _interopRequireDefault(_dAgoraShopSol);
 
-	var _Navigation = __webpack_require__(334);
+	var _gpcCodes = __webpack_require__(334);
+
+	var _gpcCodes2 = _interopRequireDefault(_gpcCodes);
+
+	var _Navigation = __webpack_require__(335);
 
 	var _Navigation2 = _interopRequireDefault(_Navigation);
 
-	var _status = __webpack_require__(335);
+	var _status = __webpack_require__(337);
 
 	var _status2 = _interopRequireDefault(_status);
 
-	var _home = __webpack_require__(336);
+	var _home = __webpack_require__(338);
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _Footer = __webpack_require__(344);
+	var _Footer = __webpack_require__(346);
 
 	var _Footer2 = _interopRequireDefault(_Footer);
 
@@ -116,6 +120,7 @@
 	      accountBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_web3Helper2.default.eth.defaultAccount), "ether").toFixed(5) + " ETH",
 	      contractAddress: _dAgoraShopSol2.default.deployed().address,
 	      contractBalance: _web3Helper2.default.fromWei(_web3Helper2.default.eth.getBalance(_dAgoraShopSol2.default.deployed().address), "ether").toFixed(5),
+	      gpcList: [],
 	      productList: [],
 	      isAdmin: false
 	    };
@@ -137,7 +142,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { id: 'site-content' },
-	        _react2.default.createElement(_Navigation2.default, { accountBalance: this.state.accountBalance }),
+	        _react2.default.createElement(_Navigation2.default, { accountBalance: this.state.accountBalance, gpcList: this.state.gpcList }),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'container site-content' },
@@ -233,15 +238,11 @@
 
 	window.onload = function () {
 
-	  var gpc = $.getJSON("/json/gpcCodes.json", function (data) {
-	    var gpcJSON = data;
-	    var items = [];
-	    if ($("#gpcSegment").length > 0) {
-	      $.each(data.segment, function (key, val) {
-	        $("#gpcSegment").append("<option value='" + key + "'>" + val.description + "</li>");
-	      });
-	    }
-	  });
+	  if ($("#gpcSegment").length > 0) {
+	    $.each(_gpcCodes2.default.segment, function (key, val) {
+	      $("#gpcSegment").append("<option value='" + key + "'>" + val.description + "</li>");
+	    });
+	  }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -66616,9 +66617,129 @@
 
 /***/ },
 /* 334 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"segment": {
+			"10000000": {
+				"description": "Pet Care/Food"
+			},
+			"47000000": {
+				"description": "Cleaning/Hygiene Products"
+			},
+			"50000000": {
+				"description": "Food/Beverage/Tobacco"
+			},
+			"51000000": {
+				"description": "Healthcare"
+			},
+			"53000000": {
+				"description": "Beauty/Personal Care/Hygiene"
+			},
+			"54000000": {
+				"description": "Baby Care"
+			},
+			"58000000": {
+				"description": "Cross Segment"
+			},
+			"60000000": {
+				"description": "Textual/Printed/Reference Materials"
+			},
+			"61000000": {
+				"description": "Music"
+			},
+			"62000000": {
+				"description": "Stationery/Office Machinery/Occasion Supplies"
+			},
+			"63000000": {
+				"description": "Footwear"
+			},
+			"64000000": {
+				"description": "Personal Accessories"
+			},
+			"65000000": {
+				"description": "Computing"
+			},
+			"66000000": {
+				"description": "Communications"
+			},
+			"67000000": {
+				"description": "Clothing"
+			},
+			"68000000": {
+				"description": "Audio Visual/Photography"
+			},
+			"70000000": {
+				"description": "Arts/Crafts/Needlework"
+			},
+			"71000000": {
+				"description": "Sports Equipment"
+			},
+			"72000000": {
+				"description": "Home Appliances"
+			},
+			"73000000": {
+				"description": "Kitchen Merchandise"
+			},
+			"74000000": {
+				"description": "Camping"
+			},
+			"75000000": {
+				"description": "Household/Office Furniture/Furnishings"
+			},
+			"77000000": {
+				"description": "Automotive"
+			},
+			"78000000": {
+				"description": "Electrical Supplies"
+			},
+			"79000000": {
+				"description": "Plumbing/Heating/Ventilation/Air Conditioning"
+			},
+			"80000000": {
+				"description": "Tools/Equipment – Hand"
+			},
+			"81000000": {
+				"description": "Lawn/Garden Supplies"
+			},
+			"82000000": {
+				"description": "Tools/Equipment – Power"
+			},
+			"83000000": {
+				"description": "Building Products"
+			},
+			"84000000": {
+				"description": "Tool Storage/Workshop Aids"
+			},
+			"85000000": {
+				"description": "Safety/Protection – DIY"
+			},
+			"86000000": {
+				"description": "Toys/Games"
+			},
+			"87000000": {
+				"description": "Fuels"
+			},
+			"88000000": {
+				"description": "Lubricants"
+			},
+			"89000000": {
+				"description": "Live Animals"
+			},
+			"91000000": {
+				"description": "Safety/Security/Surveillance"
+			},
+			"92000000": {
+				"description": "Storage/Haulage Containers"
+			}
+		}
+	};
+
+/***/ },
+/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -66628,76 +66749,106 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _CategoryItem = __webpack_require__(336);
+
+	var _CategoryItem2 = _interopRequireDefault(_CategoryItem);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Navigation = function Navigation(_ref) {
 	  var accountBalance = _ref.accountBalance;
+	  var gpcList = _ref.gpcList;
+
+
+	  var CategoryItems = gpcList.map(function (gpcSegment) {
+	    console.log(gpcSegment);
+	    return _react2.default.createElement(_CategoryItem2.default, { key: parseInt(gpcSegment), item: parseInt(gpcSegment) });
+	  });
 
 	  return _react2.default.createElement(
-	    "nav",
-	    { className: "navbar navbar-inverse navbar-static-top" },
+	    'nav',
+	    { className: 'navbar navbar-inverse navbar-static-top' },
 	    _react2.default.createElement(
-	      "div",
-	      { className: "container-fluid" },
+	      'div',
+	      { className: 'container-fluid' },
 	      _react2.default.createElement(
-	        "div",
-	        { className: "navbar-header" },
+	        'div',
+	        { className: 'navbar-header' },
 	        _react2.default.createElement(
-	          "button",
-	          { type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#navbar-collapse-1", "aria-expanded": "false" },
+	          'button',
+	          { type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#navbar-collapse-1', 'aria-expanded': 'false' },
 	          _react2.default.createElement(
-	            "span",
-	            { className: "sr-only" },
-	            "Toggle navigation"
+	            'span',
+	            { className: 'sr-only' },
+	            'Toggle navigation'
 	          ),
-	          _react2.default.createElement("span", { className: "icon-bar" }),
-	          _react2.default.createElement("span", { className: "icon-bar" }),
-	          _react2.default.createElement("span", { className: "icon-bar" })
+	          _react2.default.createElement('span', { className: 'icon-bar' }),
+	          _react2.default.createElement('span', { className: 'icon-bar' }),
+	          _react2.default.createElement('span', { className: 'icon-bar' })
 	        ),
 	        _react2.default.createElement(
-	          "a",
-	          { className: "navbar-brand", href: "/" },
-	          "dAgora"
+	          'a',
+	          { className: 'navbar-brand', href: '/' },
+	          'dAgora'
 	        )
 	      ),
 	      _react2.default.createElement(
-	        "div",
-	        { className: "collapse navbar-collapse", id: "navbar-collapse-1" },
+	        'div',
+	        { className: 'collapse navbar-collapse', id: 'navbar-collapse-1' },
 	        _react2.default.createElement(
-	          "p",
-	          { className: "navbar-text navbar-right", id: "accountBalance" },
-	          "Account Balance: ",
+	          'p',
+	          { className: 'navbar-text navbar-right', id: 'accountBalance' },
+	          'Account Balance: ',
 	          _react2.default.createElement(
-	            "span",
-	            { id: "cb_balance" },
+	            'span',
+	            { id: 'cb_balance' },
 	            accountBalance
 	          )
 	        ),
 	        _react2.default.createElement(
-	          "ul",
-	          { className: "nav navbar-nav navbar-right" },
+	          'ul',
+	          { className: 'nav navbar-nav navbar-right' },
 	          _react2.default.createElement(
-	            "li",
+	            'li',
 	            null,
 	            _react2.default.createElement(
-	              "a",
-	              { href: "#" },
-	              "My Orders"
+	              'a',
+	              { href: '#' },
+	              'My Orders'
 	            )
 	          )
 	        ),
 	        _react2.default.createElement(
-	          "form",
-	          { className: "navbar-form navbar-right", role: "search" },
+	          'form',
+	          { className: 'navbar-form navbar-right', id: 'search-form', role: 'search' },
 	          _react2.default.createElement(
-	            "div",
-	            { className: "form-group" },
-	            _react2.default.createElement("input", { type: "text", className: "form-control", placeholder: "Search" })
+	            'div',
+	            { className: 'form-group' },
+	            _react2.default.createElement('input', { type: 'text', className: 'form-control', placeholder: 'Search' })
 	          ),
 	          _react2.default.createElement(
-	            "button",
-	            { type: "submit", className: "btn btn-default" },
-	            "Search"
+	            'button',
+	            { type: 'submit', className: 'btn btn-default' },
+	            'Search'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          { className: 'nav navbar-nav navbar-right' },
+	          _react2.default.createElement(
+	            'li',
+	            { className: 'dropdown' },
+	            _react2.default.createElement(
+	              'a',
+	              { href: '#', className: 'dropdown-toggle', 'data-toggle': 'dropdown', role: 'button', 'aria-haspopup': 'true', 'aria-expanded': 'false' },
+	              'Products ',
+	              _react2.default.createElement('span', { className: 'caret' })
+	            ),
+	            _react2.default.createElement(
+	              'ul',
+	              { className: 'dropdown-menu' },
+	              CategoryItems
+	            )
 	          )
 	        )
 	      )
@@ -66708,7 +66859,41 @@
 	exports.default = Navigation;
 
 /***/ },
-/* 335 */
+/* 336 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _gpcCodes = __webpack_require__(334);
+
+	var _gpcCodes2 = _interopRequireDefault(_gpcCodes);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var CategoryItem = function CategoryItem(props) {
+	  return _react2.default.createElement(
+	    'li',
+	    null,
+	    _react2.default.createElement(
+	      'a',
+	      { href: '#' },
+	      _gpcCodes2.default.segment[props.item].description
+	    )
+	  );
+	};
+
+	exports.default = CategoryItem;
+
+/***/ },
+/* 337 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -66730,7 +66915,7 @@
 	exports.default = Status;
 
 /***/ },
-/* 336 */
+/* 338 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66743,11 +66928,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ProductList = __webpack_require__(337);
+	var _ProductList = __webpack_require__(339);
 
 	var _ProductList2 = _interopRequireDefault(_ProductList);
 
-	var _Dashboard = __webpack_require__(339);
+	var _Dashboard = __webpack_require__(341);
 
 	var _Dashboard2 = _interopRequireDefault(_Dashboard);
 
@@ -66779,7 +66964,7 @@
 	exports.default = Home;
 
 /***/ },
-/* 337 */
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66792,7 +66977,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Product = __webpack_require__(338);
+	var _Product = __webpack_require__(340);
 
 	var _Product2 = _interopRequireDefault(_Product);
 
@@ -66823,7 +67008,7 @@
 	exports.default = ProductList;
 
 /***/ },
-/* 338 */
+/* 340 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66938,7 +67123,7 @@
 	exports.default = Product;
 
 /***/ },
-/* 339 */
+/* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66951,19 +67136,19 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _AddProduct = __webpack_require__(340);
+	var _AddProduct = __webpack_require__(342);
 
 	var _AddProduct2 = _interopRequireDefault(_AddProduct);
 
-	var _UpdateProduct = __webpack_require__(341);
+	var _UpdateProduct = __webpack_require__(343);
 
 	var _UpdateProduct2 = _interopRequireDefault(_UpdateProduct);
 
-	var _RemoveProduct = __webpack_require__(342);
+	var _RemoveProduct = __webpack_require__(344);
 
 	var _RemoveProduct2 = _interopRequireDefault(_RemoveProduct);
 
-	var _WithdrawFunds = __webpack_require__(343);
+	var _WithdrawFunds = __webpack_require__(345);
 
 	var _WithdrawFunds2 = _interopRequireDefault(_WithdrawFunds);
 
@@ -67044,7 +67229,7 @@
 	exports.default = Dashboard;
 
 /***/ },
-/* 340 */
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67184,7 +67369,7 @@
 	exports.default = AddProduct;
 
 /***/ },
-/* 341 */
+/* 343 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67335,7 +67520,7 @@
 	exports.default = UpdateProduct;
 
 /***/ },
-/* 342 */
+/* 344 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67431,7 +67616,7 @@
 	exports.default = UpdateProduct;
 
 /***/ },
-/* 343 */
+/* 345 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67545,7 +67730,7 @@
 	exports.default = WithdrawFunds;
 
 /***/ },
-/* 344 */
+/* 346 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

@@ -10,6 +10,7 @@ import web3 from './helpers/web3Helper';
 import dAgoraShop from '../../build/contracts/dAgoraShop.sol.js';
 dAgoraShop.setProvider(web3.currentProvider);
 
+import gpcCodes from './json/gpcCodes.json';
 import Navigation from './components/template/Navigation';
 import Status from './components/status';
 import Home from './components/home';
@@ -24,6 +25,7 @@ class App extends Component {
       accountBalance: web3.fromWei(web3.eth.getBalance(web3.eth.defaultAccount), "ether").toFixed(5)+ " ETH",
       contractAddress: dAgoraShop.deployed().address,
       contractBalance: web3.fromWei(web3.eth.getBalance(dAgoraShop.deployed().address), "ether").toFixed(5),
+      gpcList: [],
       productList: [],
       isAdmin: false
     };
@@ -94,7 +96,7 @@ class App extends Component {
   render() {
     return (
       <div id="site-content">
-        <Navigation accountBalance={this.state.accountBalance} />
+        <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} />
         <div className="container site-content">
           <Status />
           <Home dAgora={this.state.dAgora} productList={this.state.productList} isAdmin={this.state.isAdmin} />
@@ -123,13 +125,9 @@ function setStatus(message, type="info") {
 
 window.onload = function() {
 
-  var gpc = $.getJSON("/json/gpcCodes.json", function( data ) {
-    var gpcJSON = data;
-    var items = [];
-    if($("#gpcSegment").length > 0) {
-      $.each( data.segment, function( key, val ) {
-        $("#gpcSegment").append( "<option value='" + key + "'>" + val.description + "</li>" );
-      });
-    }
-  });
+  if($("#gpcSegment").length > 0) {
+    $.each( gpcCodes.segment, function( key, val ) {
+      $("#gpcSegment").append( "<option value='" + key + "'>" + val.description + "</li>" );
+    });
+  }
 }

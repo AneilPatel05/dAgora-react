@@ -142,7 +142,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { id: 'site-content' },
-	        _react2.default.createElement(_Navigation2.default, { accountBalance: this.state.accountBalance, gpcList: this.state.gpcList }),
+	        _react2.default.createElement(_Navigation2.default, { accountBalance: this.state.accountBalance, gpcList: this.state.gpcList, getProductsByGpc: this.getProductsByGpc }),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'container site-content' },
@@ -66758,11 +66758,12 @@
 	var Navigation = function Navigation(_ref) {
 	  var accountBalance = _ref.accountBalance;
 	  var gpcList = _ref.gpcList;
+	  var getProductsByGpc = _ref.getProductsByGpc;
 
 
 	  var CategoryItems = gpcList.map(function (gpcSegment) {
-	    console.log(gpcSegment);
-	    return _react2.default.createElement(_CategoryItem2.default, { key: parseInt(gpcSegment), item: parseInt(gpcSegment) });
+	    //console.log(gpcSegment);
+	    return _react2.default.createElement(_CategoryItem2.default, { key: parseInt(gpcSegment), item: parseInt(gpcSegment), getProductsByGpc: getProductsByGpc });
 	  });
 
 	  return _react2.default.createElement(
@@ -66878,17 +66879,44 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var CategoryItem = function CategoryItem(props) {
-	  return _react2.default.createElement(
-	    'li',
-	    null,
-	    _react2.default.createElement(
-	      'a',
-	      { href: '#' },
-	      _gpcCodes2.default.segment[props.item].description
-	    )
-	  );
-	};
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var CategoryItem = function (_Component) {
+	  _inherits(CategoryItem, _Component);
+
+	  function CategoryItem(props) {
+	    _classCallCheck(this, CategoryItem);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CategoryItem).call(this, props));
+
+	    _this.render = function () {
+	      return _react2.default.createElement(
+	        'li',
+	        { onClick: function onClick(event) {
+	            return _this.handleClick(event);
+	          } },
+	        _react2.default.createElement(
+	          'a',
+	          { href: '#' },
+	          _gpcCodes2.default.segment[_this.props.item].description
+	        )
+	      );
+	    };
+
+	    _this.handleClick = function (event) {
+	      event.preventDefault();
+	      _this.props.getProductsByGpc(_this.props.item);
+	    };
+
+	    return _this;
+	  }
+
+	  return CategoryItem;
+	}(_react.Component);
 
 	exports.default = CategoryItem;
 

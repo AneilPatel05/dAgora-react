@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { Component } from 'react';
 import gpcCodes from '../../json/gpcCodes.json';
 
-const CategoryItem = (props) => {
-  return (
-    <li><a href="#">{gpcCodes.segment[props.item].description}</a></li>
-  );
+class CategoryItem extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render = () => (
+    <li onClick={event => this.handleClick(event)}><a href="#">{gpcCodes.segment[this.props.item].description}</a></li>
+  )
+
+  handleClick = (event) => {
+    event.preventDefault();
+    this.props.getProductsByGpc(this.props.item);
+  }
 }
 
 export default CategoryItem;

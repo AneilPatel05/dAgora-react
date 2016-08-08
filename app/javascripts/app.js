@@ -96,7 +96,7 @@ class App extends Component {
   render() {
     return (
       <div id="site-content">
-        <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} />
+        <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} getProductsByGpc={this.getProductsByGpc} />
         <div className="container site-content">
           <Status />
           <Home dAgora={this.state.dAgora} productList={this.state.productList} isAdmin={this.state.isAdmin} />

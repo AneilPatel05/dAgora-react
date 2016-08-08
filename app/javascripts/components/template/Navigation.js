@@ -1,12 +1,12 @@
 import React from 'react';
 import CategoryItem from './CategoryItem';
 
-const Navigation = ({accountBalance, gpcList}) => {
+const Navigation = ({accountBalance, gpcList, getProductsByGpc}) => {
 
   const CategoryItems = gpcList.map((gpcSegment) => {
-    console.log(gpcSegment);
+    //console.log(gpcSegment);
     return (
-      <CategoryItem key={parseInt(gpcSegment)} item={parseInt(gpcSegment)} />
+      <CategoryItem key={parseInt(gpcSegment)} item={parseInt(gpcSegment)} getProductsByGpc={getProductsByGpc} />
     );
   });
 

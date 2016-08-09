@@ -4,7 +4,7 @@ import Product from './Product';
 const ProductList = (props) => {
   //console.log(props.productList);
   if(props.productList.length < 1) {
-    return <div>Loading...</div>
+    return <div><h2>No Products</h2></div>
   }
 
   const ProductItems = props.productList.map((product) => {

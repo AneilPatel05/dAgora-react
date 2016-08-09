@@ -115,11 +115,25 @@ contract dAgoraShop {
 				// Replace the removed product with the last product in the array
 				productCategoryMap[gpcSegment][i] = productCategoryMap[gpcSegment][productCategoryMap[gpcSegment].length-1];
 				// Delete the last product in the array
-				delete productCategoryMap[gpcSegment][productCategoryMap[gpcSegment].length-1];
+				productCategoryMap[gpcSegment].length--;
 				break;
 			}
 		}
 		delete productMap[dph];
+		if(productCategoryMap[gpcSegment].length < 1) removeGpc(gpcSegment);
+	}
+
+	function removeGpc(uint gpcSegment) isOwner {
+		delete productCategoryMap[gpcSegment];
+		for (uint i = 0; i < gpcList.length; i++) {
+			if(gpcList[i] == gpcSegment) {
+				// Replace the removed product with the last product in the array
+				gpcList[i] = gpcList[gpcList.length-1];
+				// Delete the last product in the array
+				gpcList.length--;
+				break;
+			}
+		}
 	}
 
 	/**

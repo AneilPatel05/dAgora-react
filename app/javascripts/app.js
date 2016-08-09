@@ -36,8 +36,16 @@ class App extends Component {
       return result;
     }).catch(function(e) {
       console.error(e);
-    });;
+    });
     this.getInitialProducts();
+
+    this.state.dAgora.getProductCount.call(68000000).then(function(result) {
+      console.log(parseInt(result));
+    });
+
+    this.state.dAgora.productMap.call("0x280b147ae80eadd71726576d706d558c9632ef1f5896d90b301d56286919a183").then(function(result) {
+      console.log(result);
+    })
   }
 
   getInitialProducts = () => {
@@ -49,7 +57,7 @@ class App extends Component {
         _gpcList.push(_this.state.dAgora.gpcList.call(i));
       }
       return Promise.all(_gpcList).then(function(gpcArray) {
-        //console.log(gpcArray);
+        console.log(parseInt(gpcArray));
         _this.setState({gpcList: gpcArray});
         for(var i = 0; i < gpcArray.length; i++) {
           _this.getProductsByGpc(gpcArray[i], true);
@@ -70,7 +78,7 @@ class App extends Component {
         _dphList.push(_this.state.dAgora.productCategoryMap.call(gpcSegment, i));
       }
       return Promise.all(_dphList).then(function(dphArray) {
-        //console.log(dphArray);
+        console.log(dphArray);
         var _products = [];
         for(var i = 0; i < dphArray.length; i++) {
           _products.push(_this.state.dAgora.productMap.call(dphArray[i]));

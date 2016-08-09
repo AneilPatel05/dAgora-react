@@ -38,15 +38,28 @@ contract dAgoraShop {
 	mapping (bytes32 => Order) public orderMap;
 	mapping (address => bytes32[]) public customerOrderMap;
 	bytes32[] public orderList;
+	string public name;
 
-	// Check whether the current transaction is coming from the administrator
+	// Check whether the current transaction is coming from the owner
 	modifier isOwner() {
 		if(msg.sender != owner) throw;
 		_
 	}
 
-	function dAgoraShop() {
-		owner = msg.sender;
+	// Check whether the current transaction is coming from the administrator
+	modifier isAdmin() {
+		if(msg.sender != dAgora) throw;
+		_
+	}
+
+	function dAgoraShop(string _name) {
+		owner = tx.origin;
+		dAgora = msg.sender;
+		name = _name;
+	}
+
+	function changeName(string _name) isAdmin {
+		name = name;
 	}
 
 	/**

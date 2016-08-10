@@ -59,7 +59,7 @@ contract dAgoraShop {
 	}
 
 	function changeName(string _name) isAdmin {
-		name = name;
+		name = _name;
 	}
 
 	/**

@@ -1,4 +1,88 @@
 /**
+ * @title dAgora
+ * @author Paul Szczesny
+ * A decentralized marketplace.
+ */
+contract dAgora {
+
+	mapping (string => address) shopMap;
+	mapping (bytes32 => address) public productMap;
+	uint public registrationFee;
+	address public admin;
+
+	// Check whether the current transaction is coming from the administrator
+	modifier isAdmin() {
+		if(msg.sender != admin) throw;
+		_
+	}
+
+	// Ensure that the proper registration fee has been sent to create a new shop
+	modifier checkRegistrationFee() {
+		if(msg.value < registrationFee || msg.value > registrationFee) throw;
+		_
+	}
+
+	// Check if the transaction was initiated by a registered shop
+	modifier isShop(string shopName) {
+		if(msg.sender != shopMap[shopName]) throw;
+		_
+	}
+
+	// Check if a product has already been registered globally
+	modifier isProductRegistered(string shopName, bytes32 dphCode) {
+		if(productMap[dphCode] == shopMap[shopName]) throw;
+	}
+
+	function dAgora() {
+		admin = msg.sender;
+		registrationFee = 1000000000000000000; // 1 Ether
+	}
+
+	/**
+	 * Check if a given name is availble for registration
+	 */
+	function isNameAvailable(string shopName) returns(bool available) {
+		if(shopMap[shopName] == address(0x0)) return true;
+		else return false;
+	}
+
+	function createShop(string shopName) checkRegistrationFee returns(dAgoraShop shopAddress) {
+		if(!isNameAvailable(shopName)) throw;
+		dAgoraShop newShop = new dAgoraShop(shopName);
+		shopMap[shopName] = newShop;
+		return newShop;
+	}
+
+	/**
+	 * Add a product to the global registry
+	 */
+	function addProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
+		productMap[dphCode] = shopMap[shopName];
+	}
+
+	/**
+	 * Remove a product from the global registry
+	 */
+	function removeProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
+		delete productMap[dphCode];
+	}
+
+	/**
+	 * Withdraw funds from the contract
+	 * @param recipient The Address to withdraw funds to
+	 * @param amount The amount of funds to withdraw in Wei
+	 */
+	function withdraw(address recipient, uint amount) isAdmin {
+		if(!recipient.send(amount)) throw;
+	}
+
+	function kill() isAdmin {
+    suicide(admin); // Kill contract
+  }
+}
+
+
+/**
  * @title dAgoraShop
  * @author Paul Szczesny
  * A single shop in the dAgora marketplace.
@@ -59,7 +143,7 @@ contract dAgoraShop {
 	}
 
 	function changeName(string _name) isAdmin {
-		name = name;
+		name = _name;
 	}
 
 	/**
@@ -190,86 +274,4 @@ contract dAgoraShop {
   }
 }
 
-
-/**
- * @title dAgora
- * @author Paul Szczesny
- * A decentralized marketplace.
- */
-contract dAgora {
-
-	mapping (string => address) shopMap;
-	mapping (bytes32 => address) public productMap;
-	uint public registrationFee;
-	address public admin;
-
-	// Check whether the current transaction is coming from the administrator
-	modifier isAdmin() {
-		if(msg.sender != admin) throw;
-		_
-	}
-
-	// Ensure that the proper registration fee has been sent to create a new shop
-	modifier checkRegistrationFee() {
-		if(msg.value < registrationFee || msg.value > registrationFee) throw;
-		_
-	}
-
-	// Check if the transaction was initiated by a registered shop
-	modifier isShop(string shopName) {
-		if(msg.sender != shopMap[shopName]) throw;
-		_
-	}
-
-	// Check if a product has already been registered globally
-	modifier isProductRegistered(string shopName, bytes32 dphCode) {
-		if(productMap[dphCode] == shopMap[shopName]) throw;
-	}
-
-	function dAgora() {
-		admin = msg.sender;
-		registrationFee = 1000000000000000000; // 1 Ether
-	}
-
-	/**
-	 * Check if a given name is availble for registration
-	 */
-	function isNameAvailable(string shopName) returns(bool available) {
-		if(shopMap[shopName] == address(0x0)) return true;
-		else return false;
-	}
-
-	function createShop(string shopName) checkRegistrationFee returns(dAgoraShop shopAddress) {
-		if(!isNameAvailable(shopName)) throw;
-		dAgoraShop newShop = new dAgoraShop(shopName);
-		shopMap[shopName] = newShop;
-		return newShop;
-	}
-
-	/**
-	 * Add a product to the global registry
-	 */
-	function addProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
-		productMap[dphCode] = shopMap[shopName];
-	}
-
-	/**
-	 * Remove a product from the global registry
-	 */
-	function removeProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
-		delete productMap[dphCode];
-	}
-
-	/**
-	 * Withdraw funds from the contract
-	 * @param recipient The Address to withdraw funds to
-	 * @param amount The amount of funds to withdraw in Wei
-	 */
-	function withdraw(address recipient, uint amount) isAdmin {
-		if(!recipient.send(amount)) throw;
-	}
-
-	function kill() isAdmin {
-    suicide(admin); // Kill contract
-  }
-}
+contract dAgoraInterface{function dAgoraInterface();function productMap(bytes32 )constant returns(address );function registrationFee()constant returns(uint256 );function kill();function isNameAvailable(string shopName)returns(bool available);function addProduct(string shopName,bytes32 dphCode)returns(bool success);function removeProduct(string shopName,bytes32 dphCode)returns(bool success);function createShop(string shopName)returns(dAgoraShop shopAddress);function withdraw(address recipient,uint256 amount);function admin()constant returns(address );}

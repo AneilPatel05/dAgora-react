@@ -6,7 +6,7 @@ const Navigation = ({accountBalance, gpcList, getProductsByGpc}) => {
   const CategoryItems = gpcList.map((gpcSegment) => {
     //console.log(gpcSegment);
     return (
-      <CategoryItem key={parseInt(gpcSegment)} item={parseInt(gpcSegment)} getProductsByGpc={getProductsByGpc} />
+      <CategoryItem key={parseInt(gpcSegment)} item={parseInt(gpcSegment)} />
     );
   });
 

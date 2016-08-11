@@ -57,6 +57,9 @@ h3 {
 
 .subheading {font-size: 24px; color: #ccc;}
 
+.alert {display: inline;}
+.alert-success, .alert-danger, .alert-info, .alert-warning {display: block;}
+
 #accountBalance {padding-right: 20px;}
 #balance {
   color: black;

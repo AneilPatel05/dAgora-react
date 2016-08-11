@@ -7,6 +7,7 @@ contract dAgora {
 
 	mapping (string => address) shopMap;
 	mapping (bytes32 => address) public productMap;
+	address[] shopList;
 	uint public registrationFee;
 	address public admin;
 
@@ -40,21 +41,74 @@ contract dAgora {
 
 	/**
 	 * Check if a given name is availble for registration
+	 * @param shopName The name to check for availability
 	 */
 	function isNameAvailable(string shopName) returns(bool available) {
 		if(shopMap[shopName] == address(0x0)) return true;
 		else return false;
 	}
 
+	/**
+	 * Get a shop contract address by its registered name.
+	 * @param shopName The registered name to search for.
+	 */
+	function getShopAddress(string shopName) returns(address shopAddress) {
+		return shopMap[shopName];
+	}
+
+	/**
+	 * Get the number of shops registered.
+	 */
+	function getShopListSize() returns (uint size){
+		return shopList.length;
+	}
+
+	/**
+	 * Create a new dAgoraShop contract and registers it's name with the global registrar
+	 * @param shopName The name of the shop to be created
+	 */
 	function createShop(string shopName) checkRegistrationFee returns(dAgoraShop shopAddress) {
 		if(!isNameAvailable(shopName)) throw;
 		dAgoraShop newShop = new dAgoraShop(shopName);
 		shopMap[shopName] = newShop;
+		shopList.push(newShop);
 		return newShop;
 	}
 
 	/**
-	 * Add a product to the global registry
+	 * Modify the shop name associated with a dAgoraShop contract address
+	 * @param oldName The currently registered name
+	 * @param newName The new name to register for the address
+	 */
+	function changeShopName(string oldName, string newName) isShop(oldName) returns(bool success) {
+		address shopAddress = shopMap[oldName];
+		if(!isNameAvailable(newName)) throw;
+		delete shopMap[oldName];
+		shopMap[newName] = shopAddress;
+		dAgoraShop(shopAddress).changeName(newName);
+	}
+
+	/**
+	 * Remove a shop from the registry
+	 * @param shopName The registered name of the shop to remove
+	 * @dev The array iteration will become increasingly expensive as shops are added. Need better solution.
+	 */
+	function removeShop(string shopName) isShop(shopName) returns(bool success) {
+		for(uint i = 0; i < shopList.length; i++) {
+			if(shopList[i] == shopMap[shopName]) {
+				shopList[i] = shopList[shopList.length-1];
+				shopList.length--;
+				break;
+			}
+		}
+		delete shopMap[shopName];
+		// TODO remove all products
+	}
+
+	/**
+	 * Add a product to the global registry.
+	 * @param shopName The registered shop name creating this product.
+	 * @param dphCode The DPH code for the product to add.
 	 */
 	function addProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
 		productMap[dphCode] = shopMap[shopName];
@@ -62,6 +116,8 @@ contract dAgora {
 
 	/**
 	 * Remove a product from the global registry
+	 * @param shopName The registered shop name removing this product.
+	 * @param dphCode The DPH code for the product to remove.
 	 */
 	function removeProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
 		delete productMap[dphCode];

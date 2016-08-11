@@ -17,7 +17,7 @@ Decentralized marketplace built with Ethereum + React.
 * `truffle test`
 
 ## Preview
-![alt text](https://raw.githubusercontent.com/dsystems-io/dagora/master/app/images/preview.png "App Preview")
+![alt text](https://raw.githubusercontent.com/dsystems-io/dagora-react/master/app/images/preview.png "App Preview")
 
 ## Concepts
 The structure of this contract and dApp relies upon a few concepts that deserve explanation:
@@ -25,41 +25,31 @@ The structure of this contract and dApp relies upon a few concepts that deserve 
 * **Global Product Classification (GPC)**: For prodcut categorization we are relying on the [GS1 GPC standard](http://www.gs1.org/gpc) of catetegorization to make our marketplace compatible with existing standards.
 
 ## Current Limitations
-* Single product purchases (no multi-product orders)
-* All pricing is strictly in ETH
-* Single merchant per contract
+* Large Product / Shop sets become increasingly burdensome/expensive to maintain
+* All pricing is in ETH
 * No search
-* No ability integrate delivery of physical items
+* No delivery / shipping
 
 ## Unsolved Challenges
-1. Dealing with indexes when products are removed.
-  * In order to iterate over products, We've implemented a index to map a uint => DPH. This will create issues when products are removed and the index is no longer sequential.
-  * **Proposal 1**: Keep a seperate array of open productIndex's that can be used when new products are added. So instead of a new product creating a brand new index, it first checks to see whether there is an open slot available.
-2. Providing searchability to products and orders.
+1. Providing searchability to products and orders.
   * We currently don't have an easy way for looking through the productList and attempting to match keywords to the fields in the Prodcut struct. Using the **DPH** allows for some primitive search, assuming the user knows the Title, Category, and Creator address.
   * The same is true for Orders
-3. Maintaining privacy of orders so that only the order initiator and merchant can access order details.
+2. Maintaining privacy of orders so that only the order initiator and merchant can access order details.
   * As all order details exist on the public blockchain, it is feasible for anyone to find access to the order data of any user.
 
 
 ## Todo
 * Input Validation (UX)
 * Test Coverage
-* Function to update all product fields (Contract + UX)
 * Function to update order status (Contract + UX)
-* Function to remove products (Contract + UX)
 * Display all orders to administrator (UX)
 * Display Customer orders (UX)
 * Support for co-purchasing (Contract + UX)
-* Support for merchants (Contract + UX)
 * Support for 3rd-party tokens (Contract + UX)
-* Add-to-Cart functionality (Contract + UX)
 * Handle non-scarce products that do not need stock counts
 * Support for multiple categories per product (Contract)
 * Support delivery of products and tracking
 * Real image support via IPFS
-* Create Account Switcher to pay from non-CB accounts (UX)
-* Ad-infinitum!
 
 ## License
-[MIT](https://github.com/dsystems-io/dagora/blob/master/LICENSE)
+[MIT](https://github.com/dsystems-io/dagora-react/blob/master/LICENSE)

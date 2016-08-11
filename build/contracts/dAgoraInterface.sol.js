@@ -206,13 +206,13 @@ var Web3 = require("web3");
 
   Contract.new = function() {
     if (this.currentProvider == null) {
-      throw new Error("Migrations error: Please call setProvider() first before calling new().");
+      throw new Error("dAgoraInterface error: Please call setProvider() first before calling new().");
     }
 
     var args = Array.prototype.slice.call(arguments);
 
     if (!this.unlinked_binary) {
-      throw new Error("Migrations error: contract binary not set. Can't deploy new instance.");
+      throw new Error("dAgoraInterface error: contract binary not set. Can't deploy new instance.");
     }
 
     var regex = /__[^_]+_+/g;
@@ -231,7 +231,7 @@ var Web3 = require("web3");
         return name != arr[index + 1];
       }).join(", ");
 
-      throw new Error("Migrations contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of Migrations: " + unlinked_libraries);
+      throw new Error("dAgoraInterface contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of dAgoraInterface: " + unlinked_libraries);
     }
 
     var self = this;
@@ -272,7 +272,7 @@ var Web3 = require("web3");
 
   Contract.at = function(address) {
     if (address == null || typeof address != "string" || address.length != 42) {
-      throw new Error("Invalid address passed to Migrations.at(): " + address);
+      throw new Error("Invalid address passed to dAgoraInterface.at(): " + address);
     }
 
     var contract_class = this.web3.eth.contract(this.abi);
@@ -283,7 +283,7 @@ var Web3 = require("web3");
 
   Contract.deployed = function() {
     if (!this.address) {
-      throw new Error("Cannot find deployed address: Migrations not deployed or address not set.");
+      throw new Error("Cannot find deployed address: dAgoraInterface not deployed or address not set.");
     }
 
     return this.at(this.address);
@@ -325,33 +325,14 @@ var Web3 = require("web3");
   "default": {
     "abi": [
       {
-        "constant": false,
+        "constant": true,
         "inputs": [
           {
-            "name": "new_address",
-            "type": "address"
-          }
-        ],
-        "name": "upgrade",
-        "outputs": [],
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "last_completed_migration",
-        "outputs": [
-          {
             "name": "",
-            "type": "uint256"
+            "type": "bytes32"
           }
         ],
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "owner",
+        "name": "productMap",
         "outputs": [
           {
             "name": "",
@@ -361,15 +342,126 @@ var Web3 = require("web3");
         "type": "function"
       },
       {
-        "constant": false,
-        "inputs": [
+        "constant": true,
+        "inputs": [],
+        "name": "registrationFee",
+        "outputs": [
           {
-            "name": "completed",
+            "name": "",
             "type": "uint256"
           }
         ],
-        "name": "setCompleted",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "kill",
         "outputs": [],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "shopName",
+            "type": "string"
+          }
+        ],
+        "name": "isNameAvailable",
+        "outputs": [
+          {
+            "name": "available",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "shopName",
+            "type": "string"
+          },
+          {
+            "name": "dphCode",
+            "type": "bytes32"
+          }
+        ],
+        "name": "addProduct",
+        "outputs": [
+          {
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "shopName",
+            "type": "string"
+          },
+          {
+            "name": "dphCode",
+            "type": "bytes32"
+          }
+        ],
+        "name": "removeProduct",
+        "outputs": [
+          {
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "shopName",
+            "type": "string"
+          }
+        ],
+        "name": "createShop",
+        "outputs": [
+          {
+            "name": "shopAddress",
+            "type": "address"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "admin",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
         "type": "function"
       },
       {
@@ -377,9 +469,7 @@ var Web3 = require("web3");
         "type": "constructor"
       }
     ],
-    "unlinked_binary": "0x606060405260008054600160a060020a0319163317905560f7806100236000396000f3606060405260e060020a60003504630900f01081146038578063445df0ac1460b05780638da5cb5b1460b8578063fdacd5761460c9575b005b60366004356000805433600160a060020a039081169116141560ac576001547ffdacd5760000000000000000000000000000000000000000000000000000000060609081526064919091528291600160a060020a0383169163fdacd5769160849160248183876161da5a03f1156002575050505b5050565b60ed60015481565b60ed600054600160a060020a031681565b603660043560005433600160a060020a039081169116141560ea5760018190555b50565b6060908152602090f3",
-    "updated_at": 1470909755498,
-    "address": "0xd61848e0bff8d1e81e0131c08af272794ed8801a",
+    "updated_at": 1470910673142,
     "links": {}
   }
 };
@@ -446,7 +536,7 @@ var Web3 = require("web3");
     Contract.links[name] = address;
   };
 
-  Contract.contract_name   = Contract.prototype.contract_name   = "Migrations";
+  Contract.contract_name   = Contract.prototype.contract_name   = "dAgoraInterface";
   Contract.generated_with  = Contract.prototype.generated_with  = "3.1.2";
 
   var properties = {
@@ -483,6 +573,6 @@ var Web3 = require("web3");
   } else {
     // There will only be one version of this contract in the browser,
     // and we can use that.
-    window.Migrations = Contract;
+    window.dAgoraInterface = Contract;
   }
 })();

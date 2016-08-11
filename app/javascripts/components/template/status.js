@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Status = () => {
+const Status = (props) => {
   return (
-    <div id="status" className="alert"></div>
+    <div id="status" className={"alert alert-"+props.statusType}>{props.statusMessage}</div>
   );
 }
 

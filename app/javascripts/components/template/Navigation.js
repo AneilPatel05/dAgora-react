@@ -24,9 +24,6 @@ const Navigation = ({accountBalance, gpcList, getProductsByGpc}) => {
         </div>
         <div className="collapse navbar-collapse" id="navbar-collapse-1">
           <p className="navbar-text navbar-right" id="accountBalance">Account Balance: <span id="cb_balance">{accountBalance}</span></p>
-          <ul className="nav navbar-nav navbar-right">
-            <li><a href="#">My Orders</a></li>
-          </ul>
           <form className="navbar-form navbar-right" id="search-form" role="search">
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Search" />

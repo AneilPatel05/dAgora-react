@@ -15,6 +15,7 @@ import gpcCodes from './json/gpcCodes.json';
 import Navigation from './components/template/Navigation';
 import Status from './components/template/status';
 import Footer from './components/template/Footer';
+import RegisterShop from './components/RegisterShop';
 
 class App extends Component {
   constructor(props) {
@@ -24,8 +25,8 @@ class App extends Component {
       currentShop: null,
       currentShopAddress: null,
       currentShopCategories: null,
-      statusMessage: null,
-      statusType: null,
+      statusMessage: "",
+      statusType: "",
       defaultAccount: web3.eth.defaultAccount,
       accountBalance: web3.fromWei(web3.eth.getBalance(web3.eth.defaultAccount), "ether").toFixed(5)+ " ETH",
       contractAddress: dAgora.deployed().address,
@@ -43,6 +44,13 @@ class App extends Component {
       console.error(e);
     });
     //this.getInitialProducts();
+
+    this.state.dAgora.isNameAvailable.call('test').then(function(result) {
+      console.log(result);
+    });
+    this.state.dAgora.getShopAddress.call('test').then(function(result) {
+      console.log(result);
+    });
   }
 
   render() {
@@ -50,14 +58,19 @@ class App extends Component {
       <div id="site-content">
         <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} />
         <div className="container site-content">
-          <Status />
+          <Status statusMessage={this.state.statusMessage} statusType={this.state.statusType}/>
           <div id="content">
             <h1>dAgora <span className="subheading">Decentralized Marketplace</span></h1>
+            <RegisterShop dAgora={this.state.dAgora} setStatus={this.setStatus} />
           </div>
         </div>
         <Footer contractAddress={this.state.contractAddress} contractBalance={this.state.contractBalance} />
       </div>
     );
+  }
+
+  setStatus = (message, type) => {
+    this.setState({statusMessage: message, statusType: type});
   }
 }
 

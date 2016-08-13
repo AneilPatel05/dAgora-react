@@ -6,7 +6,6 @@
 contract dAgora {
 
 	mapping (string => address) shopMap;
-	mapping (bytes32 => address) public productMap;
 	address[] shopList;
 	uint public registrationFee;
 	address public admin;
@@ -29,11 +28,6 @@ contract dAgora {
 		_
 	}
 
-	// Check if a product has already been registered globally
-	modifier isProductRegistered(string shopName, bytes32 dphCode) {
-		if(productMap[dphCode] == shopMap[shopName]) throw;
-	}
-
 	function dAgora() {
 		admin = msg.sender;
 		registrationFee = 1000000000000000000; // 1 Ether
@@ -54,6 +48,14 @@ contract dAgora {
 	 */
 	function getShopAddress(string shopName) returns(address shopAddress) {
 		return shopMap[shopName];
+	}
+
+	/**
+	 * Get a shop contract address by its numbered index.
+	 * @param index The numbered index to search for.
+	 */
+	function getShopAddressByIndex(uint index) returns(address shopAddress) {
+		return shopList[index];
 	}
 
 	/**
@@ -92,6 +94,7 @@ contract dAgora {
 	 * Remove a shop from the registry
 	 * @param shopName The registered name of the shop to remove
 	 * @dev The array iteration will become increasingly expensive as shops are added. Need better solution.
+	 * @dev Need to throw if partial transaction occurs where removed from shopList but not shopMap
 	 */
 	function removeShop(string shopName) isShop(shopName) returns(bool success) {
 		for(uint i = 0; i < shopList.length; i++) {
@@ -102,25 +105,8 @@ contract dAgora {
 			}
 		}
 		delete shopMap[shopName];
+		return true;
 		// TODO remove all products
-	}
-
-	/**
-	 * Add a product to the global registry.
-	 * @param shopName The registered shop name creating this product.
-	 * @param dphCode The DPH code for the product to add.
-	 */
-	function addProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
-		productMap[dphCode] = shopMap[shopName];
-	}
-
-	/**
-	 * Remove a product from the global registry
-	 * @param shopName The registered shop name removing this product.
-	 * @param dphCode The DPH code for the product to remove.
-	 */
-	function removeProduct(string shopName, bytes32 dphCode) isShop(shopName) isProductRegistered(shopName, dphCode) returns (bool success) {
-		delete productMap[dphCode];
 	}
 
 	/**
@@ -326,8 +312,10 @@ contract dAgoraShop {
 	}
 
 	function kill() isOwner {
+		dAgoraInterface mainContract = dAgoraInterface(dAgora);
+		if(!mainContract.removeShop(name)) throw;
     selfdestruct(owner); // Kill contract
   }
 }
 
-contract dAgoraInterface{function dAgoraInterface();function productMap(bytes32 )constant returns(address );function registrationFee()constant returns(uint256 );function kill();function isNameAvailable(string shopName)returns(bool available);function addProduct(string shopName,bytes32 dphCode)returns(bool success);function removeProduct(string shopName,bytes32 dphCode)returns(bool success);function createShop(string shopName)returns(dAgoraShop shopAddress);function withdraw(address recipient,uint256 amount);function admin()constant returns(address );}
+contract dAgoraInterface{function dAgoraInterface();function removeShop(string shopName)returns(bool success);function getShopListSize()returns(uint256 size);function registrationFee()constant returns(uint256 );function getShopAddress(string shopName)returns(address shopAddress);function kill();function isNameAvailable(string shopName)returns(bool available);function changeShopName(string oldName,string newName)returns(bool success);function createShop(string shopName)returns(dAgoraShop shopAddress);function withdraw(address recipient,uint256 amount);function admin()constant returns(address );}

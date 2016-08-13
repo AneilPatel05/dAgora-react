@@ -14,12 +14,12 @@ class RegisterShop extends Component {
 
   render = () => (
     <div>
-      <h2 className="text-center">Register Shop</h2>
-      <form className="col-md-6 col-md-offset-3">
+      <form className="col-md-6 col-md-offset-3 well">
+        <h2 className="text-center">Register Shop</h2>
         <Status statusMessage={this.state.statusMessage} statusType={this.state.statusType} />
         <p>Registration Fee: <b>{this.state.registrationFee}</b> ETH</p>
         <div className="form-group col-md-8">
-          <input type="text" className="form-control" name="name" id="name" placeholder="Stop Name" onChange={this.bindState('name')} />
+          <input type="text" className="form-control" name="name" id="name" placeholder="Shop Name" onChange={this.bindState('name')} />
         </div>
         <div className="form-group col-md-4"><button id="checkNameButton" className="btn btn-secondary" onClick={event => this.checkAvailability(event)}>Check Availability</button></div>
         <div className="col-md-12">

@@ -9,9 +9,9 @@ const Footer = ({contractBalance, contractAddress}) => {
         <a href="https://github.com/dsystems-io/dAgora"><i className="fa fa-github hvr-pulse-grow"></i></a>
       </div>
       <div className="footer-left">
-        <p className="contract_address"><b>Contract</b>: <span id="c_address" className="c_address">{contractAddress}</span></p>
+        <p className="contract_address"><b>Main Contract</b>: <span id="c_address" className="c_address">{contractAddress}</span></p>
         <p className="contract_balance">
-          <b>Balance</b>: <span id="c_balance">{contractBalance}</span> ETH
+          <b>Main Balance</b>: <span id="c_balance">{contractBalance}</span> ETH
         </p>
       </div>
       </footer>

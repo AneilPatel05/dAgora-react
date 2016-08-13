@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import gpcCodes from '../../json/gpcCodes.json';
+import gpcCodes from '../../json/gpcCodesMapped.json';
 
 class CategoryItem extends Component {
   constructor(props) {

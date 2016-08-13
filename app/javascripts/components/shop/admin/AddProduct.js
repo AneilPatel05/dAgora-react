@@ -1,13 +1,22 @@
 import React, { Component } from 'react';
 import web3 from '../../../helpers/web3Helper';
+import gpcCodes from '../../../json/gpcCodes.json';
+import GpcOption from './GpcOption';
 
 class AddProduct extends Component {
   constructor(props) {
     super(props);
-    this.state = {dAgoraShop: props.dAgoraShop};
+    this.state = {dAgoraShop: props.dAgoraShop, GpcOptions: null};
+    //this.loadGpc();
   }
 
-  render = () => (
+  render = () => {
+    const gpcItems = gpcCodes.segment.map((gpcItem) => {
+      return (
+        <GpcOption key={gpcItem.gpc} index={gpcItem.gpc} description={gpcItem.description} />
+      );
+    });
+    return (
     <div>
       <h1 className="text-center">Add New Product</h1>
       <form className="col-md-6 col-md-offset-3">
@@ -17,6 +26,7 @@ class AddProduct extends Component {
         <div className="form-group col-md-12">
           <select id="gpcSegment" name="gpcSegment" className="form-control" onChange={this.bindState('gpcSegment')}>
             <option>-- Select Category --</option>
+            {gpcItems}
           </select>
         </div>
         <div className="form-group col-md-6">
@@ -37,10 +47,28 @@ class AddProduct extends Component {
         </div>
       </form>
     </div>
-  )
+    );
+  }
 
   bindState = (property) => {
   	return (event) => { this.setState({ [property]: event.target.value }); };
+  }
+
+  loadGpc = () => {
+    console.log(gpcCodes);
+    var _gpcList = [];
+    var _this = this;
+    for (var i=0; i < gpcCodes.segment.length; i++) {
+      _gpcList.push(<GpcOption key={gpcCodes.segment[i].gpc} index={gpcCodes.segment[i].gpc} description={gpcCodes.segment[i].description} />);
+    }
+    return Promise.all(_gpcList).then(function(gpcArray) {
+      console.log(gpcArray);
+      _this.setState({GpcOptions: gpcArray.join("")}, function() {
+        _this.forceUpdate();
+      });
+    }).catch(function(e) {
+      console.error(e);
+    });
   }
 
   handleSubmit = (event) => {

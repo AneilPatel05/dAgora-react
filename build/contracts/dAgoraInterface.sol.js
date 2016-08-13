@@ -325,18 +325,30 @@ var Web3 = require("web3");
   "default": {
     "abi": [
       {
-        "constant": true,
+        "constant": false,
         "inputs": [
           {
-            "name": "",
-            "type": "bytes32"
+            "name": "shopName",
+            "type": "string"
           }
         ],
-        "name": "productMap",
+        "name": "removeShop",
         "outputs": [
           {
-            "name": "",
-            "type": "address"
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "getShopListSize",
+        "outputs": [
+          {
+            "name": "size",
+            "type": "uint256"
           }
         ],
         "type": "function"
@@ -349,6 +361,23 @@ var Web3 = require("web3");
           {
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "shopName",
+            "type": "string"
+          }
+        ],
+        "name": "getShopAddress",
+        "outputs": [
+          {
+            "name": "shopAddress",
+            "type": "address"
           }
         ],
         "type": "function"
@@ -381,36 +410,15 @@ var Web3 = require("web3");
         "constant": false,
         "inputs": [
           {
-            "name": "shopName",
+            "name": "oldName",
             "type": "string"
           },
           {
-            "name": "dphCode",
-            "type": "bytes32"
-          }
-        ],
-        "name": "addProduct",
-        "outputs": [
-          {
-            "name": "success",
-            "type": "bool"
-          }
-        ],
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "shopName",
+            "name": "newName",
             "type": "string"
-          },
-          {
-            "name": "dphCode",
-            "type": "bytes32"
           }
         ],
-        "name": "removeProduct",
+        "name": "changeShopName",
         "outputs": [
           {
             "name": "success",
@@ -469,7 +477,7 @@ var Web3 = require("web3");
         "type": "constructor"
       }
     ],
-    "updated_at": 1470910673142,
+    "updated_at": 1470966392551,
     "links": {}
   }
 };

@@ -9,17 +9,18 @@ class Shop extends Component {
     this.state = {
       dAgora: props.dAgora,
       dAgoraShop: props.dAgoraShop,
-      shopName: null;
-      contractAddress: dAgoraShop.address,
+      shopName: null,
+      contractAddress: props.dAgoraShop.address,
       contractBalance: web3.fromWei(web3.eth.getBalance(props.dAgoraShop.address), "ether").toFixed(5),
       gpcList: [],
       productList: [],
-      isAdmin: false
+      isAdmin: false,
+      setGpcList: props.setGpcList
     };
     var _this = this;
-    this.state.dAgoraShop.name.call().then(function(result)) {
-      this.setState({shopName: result});
-    }
+    this.state.dAgoraShop.name.call().then(function(result) {
+      _this.setState({shopName: result});
+    });
     this.state.dAgoraShop.owner.call().then(function(result) {
       //console.log(result);
       if(result == web3.eth.defaultAccount) _this.setState({isAdmin: true});
@@ -27,6 +28,7 @@ class Shop extends Component {
     }).catch(function(e) {
       console.error(e);
     });
+
     this.getInitialProducts();
 
     this.state.dAgoraShop.getProductCount.call(68000000).then(function(result) {
@@ -41,9 +43,9 @@ class Shop extends Component {
   render = () => {
     return (
       <div id="content">
-          <h1>{this.state.shopName} <span className="subheading">dAgora Marketplace</span></h1>
+          <h1 className="shop-name">{this.state.shopName} <span className="subheading">dAgora Marketplace</span></h1>
           <ProductList productList={this.state.productList} dAgoraShop={this.dAgoraShop} />
-          { props.isAdmin ? (<Dashboard dAgoraShop={this.state.dAgoraShop} /> ) : null }
+          { this.state.isAdmin ? (<Dashboard dAgoraShop={this.state.dAgoraShop} /> ) : null }
       </div>
     );
   }
@@ -58,6 +60,7 @@ class Shop extends Component {
       }
       return Promise.all(_gpcList).then(function(gpcArray) {
         console.log(parseInt(gpcArray));
+        _this.state.setGpcList(gpcArray);
         _this.setState({gpcList: gpcArray});
         for(var i = 0; i < gpcArray.length; i++) {
           _this.getProductsByGpc(gpcArray[i], true);

@@ -12,7 +12,8 @@ class CategoryItem extends Component {
 
   handleClick = (event) => {
     event.preventDefault();
-    //this.props.getProductsByGpc(this.props.item);
+    this.props.setCurrentGpc(this.props.item);
+    this.props.getProductsByGpc(this.props.item);
   }
 }
 

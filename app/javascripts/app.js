@@ -26,7 +26,7 @@ class App extends Component {
       dAgora: dAgora.deployed(),
       currentShop: null,
       currentShopAddress: null,
-      currentShopCategories: null,
+      currentShopGpc: null,
       shopList: [],
       statusMessage: "",
       statusType: "",
@@ -67,12 +67,12 @@ class App extends Component {
           <RegisterShop dAgora={this.state.dAgora} setStatus={this.setStatus} />
         </div>);
     } else {
-      mainContent = <Shop dAgora={this.state.dAgora} dAgoraShop={dAgoraShop.at(this.state.currentShopAddress)} setGpcList={this.setGpcList} />;
+      mainContent = <Shop dAgora={this.state.dAgora} dAgoraShop={this.state.dAgoraShop} productList={this.state.productList} setGpcList={this.setGpcList} getProductsByGpc={this.getProductsByGpc} />;
     }
 
     return (
       <div id="site-content">
-        <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} />
+        <Navigation accountBalance={this.state.accountBalance} gpcList={this.state.gpcList} setCurrentGpc={this.setCurrentGpc} getProductsByGpc={this.getProductsByGpc} />
         <div className="container site-content">
           <Status statusMessage={this.state.statusMessage} statusType={this.state.statusType}/>
           {mainContent}
@@ -87,12 +87,21 @@ class App extends Component {
   }
 
   setShop = (address) => {
-    this.setState({currentShopAddress: address});
+    this.setState({currentShopAddress: address, dAgoraShop: dAgoraShop.at(address)});
     console.log("State: " + this.state.currentShopAddress);
+  }
+
+  setCurrentGpc = (currentGpc) => {
+    this.setState({currentShopGpc: currentGpc});
+    console.log("Current GPC: " + currentGpc);
   }
 
   setGpcList = (gpcItems) => {
     this.setState({gpcList: gpcItems});
+  }
+
+  getCurrentShopGpc = () => {
+    return this.state.currentShopGpc;
   }
 
   getShopList = () => {
@@ -108,6 +117,38 @@ class App extends Component {
       }).catch(function(e) {
         console.error(e);
       });
+    });
+  }
+
+  getProductsByGpc = (gpcSegment, concat=false, raw=false) => {
+    var _this = this;
+    _this.state.dAgoraShop.getProductCount.call(gpcSegment).then(function(result) {
+      //console.log("Segment #" + gpcArray[0] + " Count:" + parseInt(result));
+      var _dphList = [];
+      for(var i = 0; i < parseInt(result); i++) {
+        _dphList.push(_this.state.dAgoraShop.productCategoryMap.call(gpcSegment, i));
+      }
+      return Promise.all(_dphList).then(function(dphArray) {
+        console.log(dphArray);
+        var _products = [];
+        for(var i = 0; i < dphArray.length; i++) {
+          _products.push(_this.state.dAgoraShop.productMap.call(dphArray[i]));
+        }
+        return Promise.all(_products).then(function(productArray) {
+          console.log(productArray);
+          if(concat) {
+            var currentProductList = _this.state.productList;
+            productArray = currentProductList.concat(productArray);
+          }
+          _this.setState({productList: productArray});
+        }).catch(function(e) {
+          console.error(e);
+        });
+      }).catch(function(e) {
+        console.error(e);
+      });
+    }).catch(function(e) {
+      console.error(e);
     });
   }
 }

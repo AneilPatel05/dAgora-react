@@ -477,7 +477,7 @@ var Web3 = require("web3");
         "type": "constructor"
       }
     ],
-    "updated_at": 1470966392551,
+    "updated_at": 1471129784512,
     "links": {}
   }
 };

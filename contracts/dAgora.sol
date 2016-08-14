@@ -281,6 +281,7 @@ contract dAgoraShop {
 	 */
 	function buy(bytes32 index) {
 		uint price = productMap[index].price;
+		uint fee = price / 100;
 		if(msg.value < price) throw;
 		if(msg.value > price) {
 			if(!msg.sender.send(msg.value - price)) throw;
@@ -290,6 +291,7 @@ contract dAgoraShop {
 		customerOrderMap[msg.sender].push(id);
 		orderList.push(id);
 		productMap[index].stock--;
+		if(!dAgora.send(fee)) throw;
 	}
 
 	/**

@@ -8,7 +8,6 @@ const ProductList = (props) => {
   }
 
   const ProductItems = props.productList.map((product) => {
-    //console.log(product[0]);
     return (
       <Product key={product[0]} product={product} dAgoraShop={props.dAgoraShop} />
     );

@@ -25,10 +25,10 @@ The structure of this contract and dApp relies upon a few concepts that deserve 
 * **Global Product Classification (GPC)**: For prodcut categorization we are relying on the [GS1 GPC standard](http://www.gs1.org/gpc) of catetegorization to make our marketplace compatible with existing standards.
 
 ## Current Limitations
-* Large Product / Shop sets become increasingly burdensome/expensive to maintain
+* Large Product / Shop sets become increasingly burdensome/expensive to iterate over for display frontend
 * All pricing is in ETH
 * No search
-* No delivery / shipping
+* No delivery / shipping fulfillment
 
 ## Unsolved Challenges
 1. Providing searchability to products and orders.
@@ -41,8 +41,8 @@ The structure of this contract and dApp relies upon a few concepts that deserve 
 ## Todo
 * Input Validation (UX)
 * Test Coverage
-* Function to update order status (Contract + UX)
 * Display all orders to administrator (UX)
+* Function to update order status (Contract + UX)
 * Display Customer orders (UX)
 * Support for co-purchasing (Contract + UX)
 * Support for 3rd-party tokens (Contract + UX)
